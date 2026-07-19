@@ -1,6 +1,6 @@
 # Las recetas de Carlota
 
-Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
+Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, ajustar raciones, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
 
 > “Las versiones definitivas. Hasta que las vuelva a cambiar.”
 
@@ -46,7 +46,7 @@ npm run validate-recipes
 npm run build
 ```
 
-`validate-recipes` detecta IDs y slugs duplicados, recetas vacías, tiempos negativos, valores inválidos, formatos de imagen no admitidos y rutas de imágenes inexistentes.
+`validate-recipes` detecta IDs y slugs duplicados, recetas vacías, raciones o cantidades inválidas, grupos de elección rotos, tiempos negativos, formatos de imagen no admitidos y rutas de imágenes inexistentes.
 
 ## Añadir una receta
 
@@ -62,6 +62,87 @@ No hay que modificar rutas ni componentes: `/recetas/[slug]`, el buscador y el s
 ## Modificar una receta
 
 Edita su objeto en `src/data/recipes.ts`, incrementa `version` y actualiza `lastUpdated` con formato `AAAA-MM-DD`. Conserva las cantidades aproximadas como texto explícito; no las conviertas en medidas exactas sin haberlas probado.
+
+Para perfeccionar la tarta o la tortilla, busca sus slugs `tarta-queso-pequena` y `tortilla-patata-soja-texturizada`. Ajusta los datos, pasos o tiempos comprobados, actualiza `version` y `lastUpdated`, y ejecuta todas las comprobaciones de calidad.
+
+## Recetas escalables
+
+La cantidad base siempre es la cantidad realmente probada. Activa el selector en `servings`:
+
+```ts
+servings: {
+  amount: 2,
+  unit: "personas",
+  unitSingular: "persona",
+  scalable: true,
+  min: 1,
+  max: 8,
+},
+```
+
+Una cantidad numérica se escala automáticamente. La tarta usa:
+
+```ts
+{ id: "tarta-queso-fresco", quantity: 125, unit: "g", name: "queso fresco batido" }
+```
+
+Con cuatro raciones se muestra `250 g`. Para unidades con plural añade `unitPlural`; por ejemplo, una cucharadita puede convertirse en dos cucharaditas.
+
+Una medida aproximada se mantiene como texto y debe marcarse como no escalable:
+
+```ts
+{
+  id: "tarta-vainilla",
+  displayQuantity: "un chorrito pequeño",
+  name: "esencia de vainilla",
+  scalable: false,
+  notes: "Ajustar proporcionalmente sin excederse.",
+}
+```
+
+No conviertas “pizca”, “al gusto”, “tres dedos” o “cantidad necesaria” en cifras inventadas. El selector conserva esos textos y avisa de que deben ajustarse proporcionalmente.
+
+Importante: aumentar raciones solo recalcula ingredientes numéricos. Nunca multiplica automáticamente tiempos, temperatura, tamaño del recipiente ni capacidad del aparato. En la tarta, cuatro raciones probablemente requieren horno y un molde mayor aunque los ingredientes se dupliquen exactamente.
+
+## Grupos de alternativas
+
+Para indicar que no se usan todos los ingredientes a la vez, declara un grupo y enlaza sus opciones mediante `groupId`:
+
+```ts
+ingredientGroups: [{
+  id: "verdura",
+  title: "Escoge una verdura.",
+  instruction: "Usa una sola opción.",
+  selection: "one",
+}],
+ingredients: [
+  { id: "brocoli", quantity: 4, unit: "ramillete", unitPlural: "ramilletes", name: "brócoli", groupId: "verdura" },
+  { id: "calabacin", quantity: 0.5, unit: "unidad mediana", name: "calabacín", groupId: "verdura" },
+],
+```
+
+La tortilla usa este patrón para las verduras; la tarta lo usa para el queso adicional opcional.
+
+## Temporizadores en los pasos
+
+Cada paso puede tener su propio temporizador sucesivo:
+
+```ts
+{
+  title: "Termina la cocción destapada",
+  durationSeconds: 600,
+  timerLabel: "10 minutos destapada",
+  timerIncrementSeconds: 60,
+  timerNote: "Amplía en intervalos cortos y comprueba por textura.",
+}
+```
+
+- `durationSeconds`: tiempo inicial sugerido.
+- `timerIncrementSeconds`: botón para añadir tiempo sin automatizar el siguiente paso.
+- `reminderEverySeconds`: recordatorio periódico, como remover la patata cada cinco minutos.
+- `timerNote`: comprobación o contexto visible junto al temporizador.
+
+Al terminar se muestra la receta y el nombre del paso, se avisa visualmente y se reproduce un sonido si el navegador lo permite.
 
 ## Añadir una fotografía
 
@@ -134,7 +215,7 @@ Cada `git push` posterior en la rama principal genera un nuevo despliegue. Para 
 
 ## Por qué los datos son locales
 
-Esta primera versión solo necesita dos recetas públicas y una única fuente de verdad. Los datos locales hacen el sitio rápido, gratuito, fácil de versionar en Git y sin credenciales ni mantenimiento externo. La interfaz recibe objetos `Recipe`, por lo que no conoce dónde se almacenan.
+Esta primera versión mantiene un inventario pequeño de recetas públicas y una única fuente de verdad. Los datos locales hacen el sitio rápido, gratuito, fácil de versionar en Git y sin credenciales ni mantenimiento externo. La interfaz recibe objetos `Recipe`, por lo que no conoce dónde se almacenan.
 
 ## Migración futura a Supabase
 

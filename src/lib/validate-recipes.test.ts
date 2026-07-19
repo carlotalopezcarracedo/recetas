@@ -7,6 +7,13 @@ describe("validateRecipes", () => {
     expect(validateRecipes(recipes)).toEqual([]);
   });
 
+  it("mantiene únicos todos los slugs, incluidos los nuevos", () => {
+    const slugs = recipes.map((recipe) => recipe.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    expect(slugs).toContain("tarta-queso-pequena");
+    expect(slugs).toContain("tortilla-patata-soja-texturizada");
+  });
+
   it("incluye las nuevas recetas con sus raciones, opcionales y grupos de elección", () => {
     const cheesecake = recipes.find((recipe) => recipe.slug === "tarta-queso-pequena");
     const tortilla = recipes.find((recipe) => recipe.slug === "tortilla-patata-soja-texturizada");

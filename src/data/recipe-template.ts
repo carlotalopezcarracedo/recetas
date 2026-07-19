@@ -18,13 +18,32 @@ export const recipeTemplate: Recipe = {
   cookTimeMinutes: 0,
   totalTimeMinutes: 0,
   difficulty: "facil",
-  servings: { amount: 1, unit: "ración" },
+  // Para activar el selector: scalable: true. El amount es la cantidad probada.
+  servings: { amount: 2, unit: "personas", unitSingular: "persona", scalable: true, min: 1, max: 12 },
   tools: [],
   ingredients: [
-    { id: "ingrediente-id-unico", displayQuantity: "al gusto", name: "Ingrediente", scalable: false },
+    // Cantidad exacta: se recalcula automáticamente.
+    { id: "ingrediente-exacto", quantity: 125, unit: "g", name: "Ingrediente exacto" },
+    // Cantidad aproximada: nunca se convierte falsamente en un número.
+    { id: "ingrediente-aproximado", displayQuantity: "un chorrito", name: "Ingrediente aproximado", scalable: false },
+    // Alternativa dentro del grupo declarado abajo.
+    { id: "alternativa-a", quantity: 1, unit: "unidad", unitPlural: "unidades", name: "Alternativa A", groupId: "alternativas" },
+    { id: "alternativa-b", displayQuantity: "al gusto", name: "Alternativa B", scalable: false, groupId: "alternativas" },
+  ],
+  ingredientGroups: [
+    { id: "alternativas", title: "Escoge una alternativa", instruction: "No se utilizan todas a la vez.", selection: "one" },
   ],
   steps: [
-    { id: "paso-id-unico", title: "Título del paso", instruction: "Instrucción clara." },
+    {
+      id: "paso-id-unico",
+      title: "Título del paso",
+      instruction: "Instrucción clara.",
+      durationSeconds: 300,
+      timerLabel: "5 minutos sugeridos",
+      timerIncrementSeconds: 60,
+      reminderEverySeconds: 120,
+      timerNote: "Explica aquí qué debe comprobarse.",
+    },
   ],
   notes: [],
   warnings: [],

@@ -39,7 +39,7 @@ function playCompletionSound() {
 
 export function RecipeTimer({ durationSeconds, label, recipeName, stepName, incrementSeconds, reminderEverySeconds, note }: RecipeTimerProps) {
   const [remaining, setRemaining] = useState(durationSeconds);
-  const [elapsed, setElapsed] = useState(0);
+  const [, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const [reminderMessage, setReminderMessage] = useState<string | null>(null);
   const completedRef = useRef(false);
