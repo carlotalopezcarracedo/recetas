@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Heart } from "lucide-react";
 import { RecipeExplorer } from "@/components/recipe-explorer";
+import { SITE_URL } from "@/config/site";
 import { recipes } from "@/data/recipes";
 
-export const metadata: Metadata = { title: "Favoritas", description: "Tus recetas favoritas, guardadas en este dispositivo.", alternates: { canonical: "/favoritas" } };
+export const metadata: Metadata = { title: "Favoritas", description: "Tus recetas favoritas, guardadas en este dispositivo.", alternates: { canonical: `${SITE_URL}/favoritas` } };
 
 export default function FavoritesPage() {
   return (

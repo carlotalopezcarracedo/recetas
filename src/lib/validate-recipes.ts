@@ -81,6 +81,17 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       }
     }
 
+    const ingredientSectionIds = new Set<string>();
+    for (const section of recipe.ingredientSections ?? []) {
+      if (ingredientSectionIds.has(section.id)) {
+        issues.push({ recipe: context, message: `Sección de ingredientes duplicada: ${section.id}` });
+      }
+      ingredientSectionIds.add(section.id);
+      if (!recipe.ingredients.some((ingredient) => ingredient.sectionId === section.id)) {
+        issues.push({ recipe: context, message: `La sección de ingredientes ${section.id} está vacía.` });
+      }
+    }
+
     const groupIds = new Set<string>();
     for (const group of recipe.ingredientGroups ?? []) {
       if (groupIds.has(group.id)) {
@@ -89,6 +100,9 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       groupIds.add(group.id);
       if (!recipe.ingredients.some((ingredient) => ingredient.groupId === group.id)) {
         issues.push({ recipe: context, message: `El grupo ${group.id} no contiene ingredientes.` });
+      }
+      if (group.sectionId && !ingredientSectionIds.has(group.sectionId)) {
+        issues.push({ recipe: context, message: `El grupo ${group.id} referencia una sección inexistente.` });
       }
     }
     for (const ingredient of recipe.ingredients) {
@@ -101,15 +115,32 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       if (ingredient.groupId && !groupIds.has(ingredient.groupId)) {
         issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} referencia un grupo inexistente.` });
       }
+      if (ingredient.sectionId && !ingredientSectionIds.has(ingredient.sectionId)) {
+        issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} referencia una sección inexistente.` });
+      }
     }
 
-    for (const item of [...recipe.ingredients, ...(recipe.ingredientGroups ?? []), ...recipe.steps]) {
+    const stepSectionIds = new Set<string>();
+    for (const section of recipe.stepSections ?? []) {
+      if (stepSectionIds.has(section.id)) {
+        issues.push({ recipe: context, message: `Sección de pasos duplicada: ${section.id}` });
+      }
+      stepSectionIds.add(section.id);
+      if (!recipe.steps.some((step) => step.sectionId === section.id)) {
+        issues.push({ recipe: context, message: `La sección de pasos ${section.id} está vacía.` });
+      }
+    }
+
+    for (const item of [...recipe.ingredients, ...(recipe.ingredientGroups ?? []), ...(recipe.ingredientSections ?? []), ...recipe.steps, ...(recipe.stepSections ?? [])]) {
       if (nestedIds.has(item.id)) {
         issues.push({ recipe: context, message: `ID de ingrediente o paso duplicado: ${item.id}` });
       }
       nestedIds.add(item.id);
     }
     for (const step of recipe.steps) {
+      if (step.sectionId && !stepSectionIds.has(step.sectionId)) {
+        issues.push({ recipe: context, message: `El paso ${step.id} referencia una sección inexistente.` });
+      }
       if (step.durationSeconds !== undefined && step.durationSeconds < 0) {
         issues.push({ recipe: context, message: `El paso ${step.id} tiene una duración negativa.` });
       }
@@ -118,6 +149,20 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       }
       if (step.reminderEverySeconds !== undefined && step.reminderEverySeconds <= 0) {
         issues.push({ recipe: context, message: `El paso ${step.id} tiene un recordatorio no válido.` });
+      }
+      if (step.completionCondition !== undefined && !step.completionCondition.trim()) {
+        issues.push({ recipe: context, message: `El paso ${step.id} tiene una condición final vacía.` });
+      }
+      if (step.repeatable) {
+        if (!step.repeatable.repeatInstruction.trim() || !step.repeatable.stopCondition.trim()) {
+          issues.push({ recipe: context, message: `El paso repetible ${step.id} necesita instrucción y condición de parada.` });
+        }
+        if (step.repeatable.suggestedIntervalSeconds !== undefined && step.repeatable.suggestedIntervalSeconds <= 0) {
+          issues.push({ recipe: context, message: `El paso repetible ${step.id} tiene un intervalo no válido.` });
+        }
+        if (step.repeatable.maxSuggestedRepeats !== undefined && step.repeatable.maxSuggestedRepeats <= 0) {
+          issues.push({ recipe: context, message: `El paso repetible ${step.id} tiene un máximo orientativo no válido.` });
+        }
       }
     }
   }

@@ -23,12 +23,15 @@ export const recipeTemplate: Recipe = {
   tools: [],
   ingredients: [
     // Cantidad exacta: se recalcula automáticamente.
-    { id: "ingrediente-exacto", quantity: 125, unit: "g", name: "Ingrediente exacto" },
+    { id: "ingrediente-exacto", quantity: 125, unit: "g", name: "Ingrediente exacto", sectionId: "base" },
     // Cantidad aproximada: nunca se convierte falsamente en un número.
-    { id: "ingrediente-aproximado", displayQuantity: "un chorrito", name: "Ingrediente aproximado", scalable: false },
+    { id: "ingrediente-aproximado", displayQuantity: "un chorrito", name: "Ingrediente aproximado", scalable: false, sectionId: "base" },
     // Alternativa dentro del grupo declarado abajo.
     { id: "alternativa-a", quantity: 1, unit: "unidad", unitPlural: "unidades", name: "Alternativa A", groupId: "alternativas" },
     { id: "alternativa-b", displayQuantity: "al gusto", name: "Alternativa B", scalable: false, groupId: "alternativas" },
+  ],
+  ingredientSections: [
+    { id: "base", title: "Preparación principal", description: "Ingredientes de la base." },
   ],
   ingredientGroups: [
     { id: "alternativas", title: "Escoge una alternativa", instruction: "No se utilizan todas a la vez.", selection: "one" },
@@ -43,7 +46,19 @@ export const recipeTemplate: Recipe = {
       timerIncrementSeconds: 60,
       reminderEverySeconds: 120,
       timerNote: "Explica aquí qué debe comprobarse.",
+      sectionId: "preparacion",
+      completionCondition: "Describe la señal visual que indica que ha terminado.",
+      repeatable: {
+        enabled: true,
+        repeatInstruction: "Repite la operación y vuelve a comprobar.",
+        stopCondition: "Detente al alcanzar la textura descrita.",
+        suggestedIntervalSeconds: 30,
+        maxSuggestedRepeats: 6,
+      },
     },
+  ],
+  stepSections: [
+    { id: "preparacion", title: "Preparación principal" },
   ],
   notes: [],
   warnings: [],

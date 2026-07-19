@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { BookHeart, RefreshCcw, Smartphone } from "lucide-react";
+import { SITE_URL } from "@/config/site";
 
-export const metadata: Metadata = { title: "Acerca de", description: "Por qué existe este recetario personal.", alternates: { canonical: "/acerca-de" } };
+export const metadata: Metadata = { title: "Acerca de", description: "Por qué existe este recetario personal.", alternates: { canonical: `${SITE_URL}/acerca-de` } };
 
 export default function AboutPage() {
   return (

@@ -24,6 +24,7 @@ export type RecipeIngredient = {
   optional?: boolean;
   scalable?: boolean;
   groupId?: string;
+  sectionId?: string;
 };
 
 export type IngredientGroup = {
@@ -32,6 +33,27 @@ export type IngredientGroup = {
   instruction: string;
   selection: "one" | "any";
   optional?: boolean;
+  sectionId?: string;
+};
+
+export type IngredientSection = {
+  id: string;
+  title: string;
+  description?: string;
+};
+
+export type StepSection = {
+  id: string;
+  title: string;
+  description?: string;
+};
+
+export type RepeatableStep = {
+  enabled: true;
+  repeatInstruction: string;
+  stopCondition: string;
+  suggestedIntervalSeconds?: number;
+  maxSuggestedRepeats?: number;
 };
 
 export type RecipeStep = {
@@ -44,6 +66,9 @@ export type RecipeStep = {
   reminderEverySeconds?: number;
   timerNote?: string;
   warning?: string;
+  sectionId?: string;
+  completionCondition?: string;
+  repeatable?: RepeatableStep;
 };
 
 export type Recipe = {
@@ -76,7 +101,9 @@ export type Recipe = {
   tools: string[];
   ingredients: RecipeIngredient[];
   ingredientGroups?: IngredientGroup[];
+  ingredientSections?: IngredientSection[];
   steps: RecipeStep[];
+  stepSections?: StepSection[];
   restTimeLabel?: string;
   refrigerationTimeLabel?: string;
   recommendedAppliances?: string[];

@@ -4,11 +4,12 @@ import { Minus, Plus, RotateCcw, Scale, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { IngredientList } from "@/components/ingredient-list";
 import { adjustServingCount, getScaleFactor } from "@/lib/servings";
-import type { IngredientGroup, Recipe, RecipeIngredient } from "@/types/recipe";
+import type { IngredientGroup, IngredientSection, Recipe, RecipeIngredient } from "@/types/recipe";
 
 type ServingAdjusterProps = {
   ingredients: RecipeIngredient[];
   groups?: IngredientGroup[];
+  sections?: IngredientSection[];
   servings: NonNullable<Recipe["servings"]>;
 };
 
@@ -16,7 +17,7 @@ function getServingLabel(value: number, servings: NonNullable<Recipe["servings"]
   return value === 1 ? (servings.unitSingular ?? servings.unit) : servings.unit;
 }
 
-export function ServingAdjuster({ ingredients, groups, servings }: ServingAdjusterProps) {
+export function ServingAdjuster({ ingredients, groups, sections, servings }: ServingAdjusterProps) {
   const [selectedServings, setSelectedServings] = useState(servings.amount);
   const limits = { base: servings.amount, min: servings.min, max: servings.max };
   const factor = getScaleFactor(servings.amount, selectedServings);
@@ -52,7 +53,7 @@ export function ServingAdjuster({ ingredients, groups, servings }: ServingAdjust
         <RotateCcw aria-hidden="true" size={16} /> Recuperar cantidad original
       </button>
       <p className="scaling-warning"><TriangleAlert aria-hidden="true" size={18} />Las cantidades se ajustan automáticamente, pero el recipiente, el tiempo de cocción y el aparato pueden necesitar cambios.</p>
-      <IngredientList ingredients={ingredients} groups={groups} scaleFactor={factor} />
+      <IngredientList ingredients={ingredients} groups={groups} sections={sections} scaleFactor={factor} />
     </div>
   );
 }

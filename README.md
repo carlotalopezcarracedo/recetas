@@ -1,6 +1,6 @@
 # Las recetas de Carlota
 
-Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, ajustar raciones, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
+Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, ajustar raciones, organizar ingredientes y pasos por secciones, contar ciclos repetidos, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
 
 > “Las versiones definitivas. Hasta que las vuelva a cambiar.”
 
@@ -46,7 +46,7 @@ npm run validate-recipes
 npm run build
 ```
 
-`validate-recipes` detecta IDs y slugs duplicados, recetas vacías, raciones o cantidades inválidas, grupos de elección rotos, tiempos negativos, formatos de imagen no admitidos y rutas de imágenes inexistentes.
+`validate-recipes` detecta IDs y slugs duplicados, recetas vacías, raciones o cantidades inválidas, grupos o secciones rotos, ciclos incompletos, tiempos negativos y formatos de imagen no admitidos.
 
 ## Añadir una receta
 
@@ -63,7 +63,7 @@ No hay que modificar rutas ni componentes: `/recetas/[slug]`, el buscador y el s
 
 Edita su objeto en `src/data/recipes.ts`, incrementa `version` y actualiza `lastUpdated` con formato `AAAA-MM-DD`. Conserva las cantidades aproximadas como texto explícito; no las conviertas en medidas exactas sin haberlas probado.
 
-Para perfeccionar la tarta o la tortilla, busca sus slugs `tarta-queso-pequena` y `tortilla-patata-soja-texturizada`. Ajusta los datos, pasos o tiempos comprobados, actualiza `version` y `lastUpdated`, y ejecuta todas las comprobaciones de calidad.
+Para perfeccionar cualquiera de las recetas nuevas, busca `tarta-queso-pequena`, `tortilla-patata-soja-texturizada`, `bol-avena-fruta-frutos-secos` o `bolitas-soja-texturizada-verdura`. Ajusta los datos, pasos o tiempos comprobados, actualiza `version` y `lastUpdated`, y ejecuta todas las comprobaciones de calidad.
 
 ## Recetas escalables
 
@@ -123,6 +123,47 @@ ingredients: [
 
 La tortilla usa este patrón para las verduras; la tarta lo usa para el queso adicional opcional.
 
+## Secciones de ingredientes y pasos
+
+Las listas siguen siendo planas para conservar compatibilidad con las recetas existentes. Una sección declara su título y cada elemento la referencia mediante `sectionId`:
+
+```ts
+ingredientSections: [
+  { id: "salsa", title: "Salsa", description: "Se prepara mientras se hornean las bolitas." },
+],
+ingredients: [
+  { id: "queso", quantity: 2, unit: "cucharaditas", name: "de queso fresco batido", sectionId: "salsa" },
+],
+stepSections: [
+  { id: "principal", title: "Preparación principal" },
+  { id: "acompanamiento", title: "Acompañamiento" },
+  { id: "salsa-pasos", title: "Salsa" },
+],
+steps: [
+  { id: "mezclar", title: "Prepara la mezcla", instruction: "…", sectionId: "principal" },
+],
+```
+
+Los grupos de elección también admiten `sectionId`. Las bolitas usan este sistema para separar preparación principal, mazorca y salsa, y para mostrar aceite y aguacate como alternativas, no como dos ingredientes obligatorios.
+
+## Pasos repetibles y condiciones finales
+
+Usa `repeatable` cuando la persona que cocina deba decidir cuántas veces repetir un ciclo:
+
+```ts
+repeatable: {
+  enabled: true,
+  repeatInstruction: "Rompe la mezcla, añade claras, remueve y cocina otros 30 segundos.",
+  stopCondition: "El bol está casi lleno, la avena sigue suelta y no queda clara cruda.",
+  suggestedIntervalSeconds: 30,
+  maxSuggestedRepeats: 6,
+},
+```
+
+La interfaz muestra un contador manual con “Marcar otro ciclo” y “Reiniciar ciclos”. `maxSuggestedRepeats` es solo una referencia: nunca bloquea más ciclos ni inicia temporizadores automáticamente. Para una señal visual de finalización que no dependa de repetir, añade `completionCondition` al paso. En modo cocina se muestra destacada.
+
+La cantidad de claras del bol de avena se guarda como `displayQuantity` porque depende del tamaño del recipiente, la absorción y el número de ciclos; no se inventa una cifra total.
+
 ## Temporizadores en los pasos
 
 Cada paso puede tener su propio temporizador sucesivo:
@@ -143,6 +184,8 @@ Cada paso puede tener su propio temporizador sucesivo:
 - `timerNote`: comprobación o contexto visible junto al temporizador.
 
 Al terminar se muestra la receta y el nombre del paso, se avisa visualmente y se reproduce un sonido si el navegador lo permite.
+
+Para un aviso intermedio, configura el tiempo total y usa `reminderEverySeconds`. El bol de avena utiliza 60 segundos con un aviso a los 30 para sacar, romper y continuar. Si cada intervalo requiere una decisión independiente, utiliza un paso repetible con un temporizador de 30 segundos.
 
 ## Añadir una fotografía
 
@@ -193,6 +236,30 @@ git branch -M main
 git remote add origin https://github.com/TU_USUARIO/recetas-de-carlota.git
 git push -u origin main
 ```
+
+## Publicar con GitHub Actions y GitHub Pages
+
+El workflow `.github/workflows/deploy-pages.yml` se ejecuta al subir cambios a `master` o manualmente desde **Actions**. Instala con `npm ci`, ejecuta lint, TypeScript, pruebas y validación, genera una exportación estática en `out/` y la publica con las acciones oficiales de GitHub Pages.
+
+Para activarlo una vez en GitHub:
+
+1. Abre **Settings → Pages** en el repositorio.
+2. En **Build and deployment → Source**, selecciona **GitHub Actions**.
+3. Sube estos cambios a `master` o ejecuta **Comprobar y publicar en GitHub Pages** desde la pestaña **Actions**.
+4. Cuando termine, abre `https://carlotalopezcarracedo.github.io/recetas/`.
+
+El workflow calcula el usuario y el nombre del repositorio automáticamente. Durante esa compilación establece `GITHUB_PAGES=true`, `NEXT_PUBLIC_BASE_PATH=/recetas` y la URL pública correspondiente. `next.config.ts` activa entonces `output: "export"`, rutas con barra final e imágenes sin optimización de servidor. En local esas opciones permanecen desactivadas.
+
+Para reproducir exactamente la exportación de Pages en PowerShell:
+
+```powershell
+$env:GITHUB_PAGES="true"
+$env:NEXT_PUBLIC_BASE_PATH="/recetas"
+$env:NEXT_PUBLIC_SITE_URL="https://carlotalopezcarracedo.github.io/recetas"
+npm.cmd run build
+```
+
+El resultado queda en `out/`. El `basePath` se integra en los enlaces de Next.js; los recursos públicos y el manifiesto también utilizan el prefijo del repositorio.
 
 ## Desplegar gratis en Vercel
 

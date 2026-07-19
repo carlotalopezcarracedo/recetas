@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: RecipePageProps): Promise<Met
   const { slug } = await params;
   const recipe = getRecipeBySlug(slug);
   if (!recipe) return { title: "Receta no encontrada" };
-  const path = `/recetas/${recipe.slug}`;
+  const path = `${SITE_URL}/recetas/${recipe.slug}`;
   return {
     title: recipe.name,
     description: recipe.shortDescription,
@@ -89,14 +89,14 @@ export default async function RecipePage({ params }: RecipePageProps) {
             <section className="content-card ingredient-card">
               <h2>Ingredientes</h2>
               {recipe.servings?.scalable ? (
-                <ServingAdjuster ingredients={recipe.ingredients} groups={recipe.ingredientGroups} servings={recipe.servings} />
+                <ServingAdjuster ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} servings={recipe.servings} />
               ) : (
-                <IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} />
+                <IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} />
               )}
             </section>
           </aside>
           <div className="recipe-main-column">
-            <section className="recipe-section"><div className="section-heading"><span>Sin prisa, pero sin perderse</span><h2>Pasos</h2></div><RecipeSteps steps={recipe.steps} recipeName={recipe.name} /></section>
+            <section className="recipe-section"><div className="section-heading"><span>Sin prisa, pero sin perderse</span><h2>Pasos</h2></div><RecipeSteps steps={recipe.steps} sections={recipe.stepSections} recipeName={recipe.name} /></section>
             {recipe.warnings && recipe.warnings.length > 0 && <section className="warning-card"><h2><AlertTriangle aria-hidden="true" size={22} /> Advertencias importantes</h2><ul>{recipe.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></section>}
             {recipe.notes && recipe.notes.length > 0 && <section className="content-card"><h2><NotebookPen aria-hidden="true" size={21} /> Notas</h2><ul className="plain-list">{recipe.notes.map((note) => <li key={note}>{note}</li>)}</ul></section>}
             {recipe.variations && recipe.variations.length > 0 && <section className="recipe-section"><div className="section-heading"><span>Por si hoy apetece otra cosa</span><h2>Variaciones</h2></div><div className="variations-grid">{recipe.variations.map((variation) => <article key={variation.name}><h3>{variation.name}</h3><p>{variation.description}</p></article>)}</div></section>}

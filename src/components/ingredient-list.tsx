@@ -1,10 +1,11 @@
 import { CircleCheck, ListChecks, Plus } from "lucide-react";
 import { getIngredientQuantityText, isIngredientScalable } from "@/lib/servings";
-import type { IngredientGroup, RecipeIngredient } from "@/types/recipe";
+import type { IngredientGroup, IngredientSection, RecipeIngredient } from "@/types/recipe";
 
 type IngredientListProps = {
   ingredients: RecipeIngredient[];
   groups?: IngredientGroup[];
+  sections?: IngredientSection[];
   compact?: boolean;
   scaleFactor?: number;
 };
@@ -34,21 +35,31 @@ function IngredientRow({ ingredient, scaleFactor, icon }: IngredientRowProps) {
   );
 }
 
-export function IngredientList({ ingredients, groups = [], compact = false, scaleFactor = 1 }: IngredientListProps) {
+type IngredientCollectionProps = {
+  ingredients: RecipeIngredient[];
+  groups: IngredientGroup[];
+  scaleFactor: number;
+  nested?: boolean;
+};
+
+function IngredientCollection({ ingredients, groups, scaleFactor, nested = false }: IngredientCollectionProps) {
   const ungrouped = ingredients.filter((ingredient) => !ingredient.groupId);
   const required = ungrouped.filter((ingredient) => !ingredient.optional);
   const optional = ungrouped.filter((ingredient) => ingredient.optional);
+  const Subheading = nested ? "h4" : "h3";
 
   return (
-    <div className={compact ? "ingredient-list compact" : "ingredient-list"}>
-      <ul>
-        {required.map((ingredient) => (
-          <IngredientRow key={ingredient.id} ingredient={ingredient} scaleFactor={scaleFactor} icon="check" />
-        ))}
-      </ul>
+    <>
+      {required.length > 0 && (
+        <ul>
+          {required.map((ingredient) => (
+            <IngredientRow key={ingredient.id} ingredient={ingredient} scaleFactor={scaleFactor} icon="check" />
+          ))}
+        </ul>
+      )}
       {optional.length > 0 && (
         <div className="optional-ingredients">
-          <h3><Plus aria-hidden="true" size={18} /> Opcionales</h3>
+          <Subheading><Plus aria-hidden="true" size={18} /> Opcionales</Subheading>
           <ul>
             {optional.map((ingredient) => (
               <IngredientRow key={ingredient.id} ingredient={ingredient} scaleFactor={scaleFactor} icon="plus" />
@@ -63,7 +74,7 @@ export function IngredientList({ ingredients, groups = [], compact = false, scal
             <div className="choice-heading">
               <ListChecks aria-hidden="true" size={19} />
               <div>
-                <h3 id={`group-${group.id}`}>{group.title}</h3>
+                <Subheading id={`group-${group.id}`}>{group.title}</Subheading>
                 <p>{group.instruction}</p>
               </div>
             </div>
@@ -73,6 +84,32 @@ export function IngredientList({ ingredients, groups = [], compact = false, scal
                 <IngredientRow key={ingredient.id} ingredient={ingredient} scaleFactor={scaleFactor} icon="plus" />
               ))}
             </ul>
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
+export function IngredientList({ ingredients, groups = [], sections = [], compact = false, scaleFactor = 1 }: IngredientListProps) {
+  const unsectionedIngredients = ingredients.filter((ingredient) => !ingredient.sectionId);
+  const unsectionedGroups = groups.filter((group) => !group.sectionId);
+
+  return (
+    <div className={compact ? "ingredient-list compact" : "ingredient-list"}>
+      {(unsectionedIngredients.length > 0 || unsectionedGroups.length > 0) && (
+        <IngredientCollection ingredients={unsectionedIngredients} groups={unsectionedGroups} scaleFactor={scaleFactor} />
+      )}
+      {sections.map((section) => {
+        const sectionIngredients = ingredients.filter((ingredient) => ingredient.sectionId === section.id);
+        const sectionGroups = groups.filter((group) => group.sectionId === section.id);
+        return (
+          <section className="ingredient-section" key={section.id} aria-labelledby={`ingredient-section-${section.id}`}>
+            <header>
+              <h3 id={`ingredient-section-${section.id}`}>{section.title}</h3>
+              {section.description && <p>{section.description}</p>}
+            </header>
+            <IngredientCollection ingredients={sectionIngredients} groups={sectionGroups} scaleFactor={scaleFactor} nested />
           </section>
         );
       })}

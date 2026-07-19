@@ -1,4 +1,4 @@
-import { RotateCcw } from "lucide-react";
+import { ChevronDown, RotateCcw } from "lucide-react";
 import { MEAL_TYPES, type FlavorType, type MealType } from "@/types/recipe";
 
 type FilterChipsProps = {
@@ -12,7 +12,8 @@ type FilterChipsProps = {
   hasFilters: boolean;
 };
 
-const tagFilters = ["rápida", "microondas", "sartén", "horno", "alta en proteína", "vegetariana"];
+const primaryTagFilters = ["microondas", "horno", "alta en proteína"];
+const extraTagFilters = ["con fruta", "con verduras", "con salsa", "por ciclos", "con acompañamiento", "sartén", "rápida", "vegetariana"];
 
 function titleCase(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -36,9 +37,15 @@ export function FilterChips({ selectedMeals, selectedFlavors, selectedTags, onMe
       <div className="filter-row">
         <span className="filter-label">También</span>
         <div className="chip-scroll">
-          {tagFilters.map((tag) => <button key={tag} type="button" className="chip" aria-pressed={selectedTags.includes(tag)} onClick={() => onTagToggle(tag)}>{titleCase(tag)}</button>)}
+          {primaryTagFilters.map((tag) => <button key={tag} type="button" className="chip" aria-pressed={selectedTags.includes(tag)} onClick={() => onTagToggle(tag)}>{titleCase(tag)}</button>)}
         </div>
       </div>
+      <details className="more-filters">
+        <summary>Más filtros <ChevronDown aria-hidden="true" size={17} /></summary>
+        <div className="extra-filter-content chip-scroll">
+          {extraTagFilters.map((tag) => <button key={tag} type="button" className="chip" aria-pressed={selectedTags.includes(tag)} onClick={() => onTagToggle(tag)}>{titleCase(tag)}</button>)}
+        </div>
+      </details>
       {hasFilters && <button type="button" className="reset-button" onClick={onReset}><RotateCcw aria-hidden="true" size={16} /> Restablecer filtros</button>}
     </div>
   );

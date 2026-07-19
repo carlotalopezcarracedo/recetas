@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CookingPot, ListChecks, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleCheckBig, CookingPot, ListChecks, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IngredientList } from "@/components/ingredient-list";
 import { RecipeTimer } from "@/components/recipe-timer";
+import { RepeatableStep } from "@/components/repeatable-step";
 import type { Recipe } from "@/types/recipe";
 
 type CookingModeProps = { recipe: Recipe };
@@ -54,28 +55,44 @@ export function CookingMode({ recipe }: CookingModeProps) {
   }, [open]);
 
   const step = recipe.steps[stepIndex];
+  const currentSection = recipe.stepSections?.find((section) => section.id === step.sectionId);
+
+  function jumpToSection(sectionId: string) {
+    const index = recipe.steps.findIndex((item) => item.sectionId === sectionId);
+    if (index >= 0) {
+      setStepIndex(index);
+      setShowIngredients(false);
+    }
+  }
 
   return (
     <>
       <button ref={triggerRef} type="button" className="primary-button cook-mode-trigger" onClick={() => setOpen(true)}><CookingPot aria-hidden="true" size={20} /> Activar modo cocina</button>
       {open && (
-        <div ref={dialogRef} className="cooking-mode" role="dialog" aria-modal="true" aria-labelledby="cooking-title">
+        <div ref={dialogRef} className={`cooking-mode${recipe.stepSections && recipe.stepSections.length > 1 ? " has-section-nav" : ""}`} role="dialog" aria-modal="true" aria-labelledby="cooking-title">
           <header>
             <div><span>Modo cocina</span><h2 id="cooking-title">{recipe.name}</h2></div>
             <button ref={closeButtonRef} type="button" className="icon-button" onClick={() => setOpen(false)} aria-label="Salir del modo cocina"><X aria-hidden="true" size={24} /></button>
           </header>
           <div className="cooking-progress" aria-label={`Paso ${stepIndex + 1} de ${recipe.steps.length}`}>
-            <span>Paso {stepIndex + 1} de {recipe.steps.length}</span>
+            <span>{currentSection ? `${currentSection.title} · ` : ""}Paso {stepIndex + 1} de {recipe.steps.length}</span>
             <div><span style={{ width: `${((stepIndex + 1) / recipe.steps.length) * 100}%` }} /></div>
           </div>
+          {recipe.stepSections && recipe.stepSections.length > 1 && (
+            <nav className="cooking-sections" aria-label="Secciones de la receta">
+              {recipe.stepSections.map((section) => (
+                <button key={section.id} type="button" aria-current={currentSection?.id === section.id ? "step" : undefined} onClick={() => jumpToSection(section.id)}>{section.title}</button>
+              ))}
+            </nav>
+          )}
           <main>
-            {showIngredients ? (
-              <section className="cooking-ingredients"><h3>Ingredientes</h3><IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} compact /></section>
-            ) : (
-              <section className="cooking-step">
+            <section className="cooking-ingredients" hidden={!showIngredients}><h3>Ingredientes</h3><IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} compact /></section>
+            <section className="cooking-step" hidden={showIngredients}>
                 <span className="giant-step-number">{stepIndex + 1}</span>
+                {currentSection && <span className="cooking-section-label">{currentSection.title}</span>}
                 <h3>{step.title ?? `Paso ${stepIndex + 1}`}</h3>
                 <p>{step.instruction}</p>
+                {step.completionCondition && <p className="cooking-completion"><CircleCheckBig aria-hidden="true" size={21} /><span><strong>Condición final</strong>{step.completionCondition}</span></p>}
                 {step.warning && <aside><strong>Ojo</strong>{step.warning}</aside>}
                 {step.durationSeconds && (
                   <RecipeTimer
@@ -89,8 +106,8 @@ export function CookingMode({ recipe }: CookingModeProps) {
                     note={step.timerNote}
                   />
                 )}
+                {step.repeatable && <RepeatableStep repeatable={step.repeatable} />}
               </section>
-            )}
           </main>
           <footer>
             <button type="button" className="ingredients-toggle" onClick={() => setShowIngredients((value) => !value)}><ListChecks aria-hidden="true" size={20} />{showIngredients ? "Volver al paso" : "Ver ingredientes"}</button>

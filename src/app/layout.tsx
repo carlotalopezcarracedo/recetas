@@ -13,11 +13,11 @@ export const metadata: Metadata = {
   title: { default: SITE_CONFIG.name, template: `%s · ${SITE_CONFIG.name}` },
   description: SITE_CONFIG.description,
   applicationName: SITE_CONFIG.name,
-  alternates: { canonical: "/" },
+  alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "/",
+    url: SITE_URL,
     siteName: SITE_CONFIG.name,
     title: SITE_CONFIG.name,
     description: SITE_CONFIG.description,

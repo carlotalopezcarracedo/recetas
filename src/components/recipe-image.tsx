@@ -1,5 +1,6 @@
 import { CakeSlice, CookingPot } from "lucide-react";
 import Image from "next/image";
+import { withBasePath } from "@/config/site";
 import type { Recipe } from "@/types/recipe";
 
 type RecipeImageProps = Pick<Recipe, "name" | "image" | "imageAlt" | "flavorType"> & {
@@ -10,7 +11,7 @@ export function RecipeImage({ name, image, imageAlt, flavorType, priority = fals
   if (image) {
     return (
       <div className="recipe-image-wrap">
-        <Image src={image} alt={imageAlt ?? name} fill sizes="(max-width: 720px) 100vw, 640px" priority={priority} className="recipe-photo" />
+        <Image src={withBasePath(image)} alt={imageAlt ?? name} fill sizes="(max-width: 720px) 100vw, 640px" priority={priority} className="recipe-photo" />
       </div>
     );
   }

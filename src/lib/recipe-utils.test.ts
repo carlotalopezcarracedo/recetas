@@ -29,6 +29,13 @@ describe("filterRecipes", () => {
     "calabacin",
     "cena",
     "maiz",
+    "arandanos",
+    "frutos secos",
+    "bolitas",
+    "falafel",
+    "mazorca",
+    "aguacate",
+    "curcuma",
   ])(
     "encuentra resultados para %s",
     (query) => {
@@ -39,6 +46,10 @@ describe("filterRecipes", () => {
   it("encuentra las recetas nuevas con texto normalizado", () => {
     expect(filterRecipes(recipes, "maiz", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("tarta-queso-pequena");
     expect(filterRecipes(recipes, "brocoli", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("tortilla-patata-soja-texturizada");
+    expect(filterRecipes(recipes, "arandanos", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bol-avena-fruta-frutos-secos");
+    expect(filterRecipes(recipes, "curcuma", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
+    expect(filterRecipes(recipes, "falafel", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
+    expect(filterRecipes(recipes, "maiz", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
   });
 
   it("combina categoría, tipo y etiqueta", () => {
@@ -48,7 +59,7 @@ describe("filterRecipes", () => {
       tags: ["microondas"],
       favoritesOnly: false,
     });
-    expect(result.map((recipe) => recipe.slug)).toEqual(["bizcocho-microondas"]);
+    expect(result.map((recipe) => recipe.slug)).toEqual(["bizcocho-microondas", "bol-avena-fruta-frutos-secos"]);
   });
 
   it("filtra favoritas usando el conjunto proporcionado", () => {

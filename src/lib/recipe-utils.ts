@@ -33,6 +33,8 @@ function searchableText(recipe: Recipe): string {
       recipe.flavorType,
       ...recipe.tags,
       ...(recipe.keywords ?? []),
+      ...(recipe.ingredientSections ?? []).flatMap((section) => [section.title, section.description]),
+      ...(recipe.stepSections ?? []).flatMap((section) => [section.title, section.description]),
       ...(recipe.ingredientGroups ?? []).flatMap((group) => [group.title, group.instruction]),
       ...recipe.ingredients.flatMap((ingredient) => [
         ingredient.name,
@@ -40,6 +42,13 @@ function searchableText(recipe: Recipe): string {
         ingredient.displayQuantity,
         ingredient.unit,
         ingredient.notes,
+      ]),
+      ...recipe.steps.flatMap((step) => [
+        step.title,
+        step.instruction,
+        step.completionCondition,
+        step.repeatable?.repeatInstruction,
+        step.repeatable?.stopCondition,
       ]),
     ]
       .filter(Boolean)

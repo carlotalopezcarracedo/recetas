@@ -12,6 +12,34 @@ describe("validateRecipes", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(slugs).toContain("tarta-queso-pequena");
     expect(slugs).toContain("tortilla-patata-soja-texturizada");
+    expect(slugs).toContain("bol-avena-fruta-frutos-secos");
+    expect(slugs).toContain("bolitas-soja-texturizada-verdura");
+  });
+
+  it("representa los ciclos de avena sin inventar una cantidad de claras", () => {
+    const oatmeal = recipes.find((recipe) => recipe.slug === "bol-avena-fruta-frutos-secos");
+    const repeatableStep = oatmeal?.steps.find((step) => step.repeatable);
+    const eggWhites = oatmeal?.ingredients.find((ingredient) => ingredient.id === "avena-claras");
+
+    expect(oatmeal?.ingredients.length).toBeGreaterThan(0);
+    expect(oatmeal?.steps.length).toBeGreaterThan(0);
+    expect(repeatableStep?.repeatable?.stopCondition).toBeTruthy();
+    expect(eggWhites?.quantity).toBeUndefined();
+    expect(eggWhites?.displayQuantity).toContain("necesarias");
+    expect(oatmeal?.ingredientGroups?.find((group) => group.id === "avena-toppings")?.selection).toBe("any");
+    expect(oatmeal?.ingredients.filter((ingredient) => ingredient.groupId === "avena-toppings").every((ingredient) => ingredient.optional)).toBe(true);
+  });
+
+  it("separa bolitas, acompañamiento y salsa, con elecciones exclusivas", () => {
+    const bites = recipes.find((recipe) => recipe.slug === "bolitas-soja-texturizada-verdura");
+    const sectionTitles = bites?.ingredientSections?.map((section) => section.title) ?? [];
+
+    expect(bites?.ingredients.length).toBeGreaterThan(0);
+    expect(bites?.steps.length).toBeGreaterThan(0);
+    expect(sectionTitles).toEqual(expect.arrayContaining(["Bolitas de soja y verdura", "Acompañamiento de mazorca", "Salsa"]));
+    expect(bites?.ingredientGroups?.find((group) => group.id === "bolitas-verdura")?.selection).toBe("one");
+    expect(bites?.ingredientGroups?.find((group) => group.id === "bolitas-salsa-grasa")?.selection).toBe("one");
+    expect(bites?.ingredients.find((ingredient) => ingredient.id === "bolitas-mazorca")?.optional).toBe(true);
   });
 
   it("incluye las nuevas recetas con sus raciones, opcionales y grupos de elección", () => {
