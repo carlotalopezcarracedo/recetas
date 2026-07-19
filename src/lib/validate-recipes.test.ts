@@ -7,6 +7,20 @@ describe("validateRecipes", () => {
     expect(validateRecipes(recipes)).toEqual([]);
   });
 
+  it("incluye las nuevas recetas con sus raciones, opcionales y grupos de elección", () => {
+    const cheesecake = recipes.find((recipe) => recipe.slug === "tarta-queso-pequena");
+    const tortilla = recipes.find((recipe) => recipe.slug === "tortilla-patata-soja-texturizada");
+
+    expect(cheesecake?.servings?.amount).toBe(2);
+    expect(tortilla?.servings?.amount).toBe(1);
+    expect(cheesecake?.ingredients.length).toBeGreaterThan(0);
+    expect(cheesecake?.steps.length).toBeGreaterThan(0);
+    expect(tortilla?.ingredients.length).toBeGreaterThan(0);
+    expect(tortilla?.steps.length).toBeGreaterThan(0);
+    expect(cheesecake?.ingredients.some((ingredient) => ingredient.optional)).toBe(true);
+    expect(tortilla?.ingredientGroups?.some((group) => group.id === "verdura" && group.selection === "one")).toBe(true);
+  });
+
   it("detecta slugs duplicados, colecciones vacías y tiempos negativos", () => {
     const invalid = {
       ...recipes[0],

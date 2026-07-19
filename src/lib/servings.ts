@@ -55,8 +55,10 @@ export function getIngredientQuantityText(
   scaleFactor = 1,
 ): string {
   if (ingredient.quantity !== undefined && ingredient.scalable !== false) {
-    const formatted = formatKitchenQuantity(ingredient.quantity * scaleFactor);
-    return ingredient.unit ? `${formatted} ${ingredient.unit}` : formatted;
+    const scaledQuantity = ingredient.quantity * scaleFactor;
+    const formatted = formatKitchenQuantity(scaledQuantity);
+    const unit = Math.abs(scaledQuantity) > 1 ? (ingredient.unitPlural ?? ingredient.unit) : ingredient.unit;
+    return unit ? `${formatted} ${unit}` : formatted;
   }
   if (ingredient.quantity !== undefined) {
     const formatted = formatKitchenQuantity(ingredient.quantity);

@@ -5,12 +5,15 @@ import { notFound } from "next/navigation";
 import { IngredientList } from "@/components/ingredient-list";
 import { RecipeActions } from "@/components/recipe-actions";
 import { RecipeImage } from "@/components/recipe-image";
+import { RecipeHighlights } from "@/components/recipe-highlights";
 import { RecipeMeta } from "@/components/recipe-meta";
 import { RecipeSteps } from "@/components/recipe-steps";
+import { ServingAdjuster } from "@/components/serving-adjuster";
 import { VersionBadge } from "@/components/version-badge";
 import { SITE_CONFIG, SITE_URL } from "@/config/site";
 import { getRecipeBySlug, recipes } from "@/data/recipes";
 import { toIsoDuration } from "@/lib/recipe-utils";
+import { getIngredientQuantityText } from "@/lib/servings";
 
 export const dynamicParams = false;
 
@@ -55,7 +58,9 @@ export default async function RecipePage({ params }: RecipePageProps) {
     prepTime: toIsoDuration(recipe.prepTimeMinutes),
     cookTime: toIsoDuration(recipe.cookTimeMinutes),
     totalTime: toIsoDuration(recipe.totalTimeMinutes),
-    recipeIngredient: recipe.ingredients.map((ingredient) => `${ingredient.quantity ?? ""} ${ingredient.name}${ingredient.optional ? " (opcional)" : ""}`.trim()),
+    recipeIngredient: recipe.ingredients.map((ingredient) =>
+      `${getIngredientQuantityText(ingredient)} ${ingredient.name}${ingredient.optional || ingredient.groupId ? " (opcional o alternativa)" : ""}`.trim(),
+    ),
     recipeInstructions: recipe.steps.map((step) => ({ "@type": "HowToStep", name: step.title, text: step.instruction })),
     keywords: recipe.tags.join(", "),
     image: recipe.image ? `${SITE_URL}${recipe.image}` : undefined,
@@ -77,13 +82,21 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </div>
         </div>
         <RecipeMeta {...recipe} />
+        <RecipeHighlights {...recipe} />
         <div className="recipe-body-grid">
           <aside className="recipe-sidebar">
             <section className="content-card"><h2><Utensils aria-hidden="true" size={21} /> Utensilios</h2><ul className="plain-list">{recipe.tools.map((tool) => <li key={tool}>{tool}</li>)}</ul></section>
-            <section className="content-card ingredient-card"><h2>Ingredientes</h2><IngredientList ingredients={recipe.ingredients} /></section>
+            <section className="content-card ingredient-card">
+              <h2>Ingredientes</h2>
+              {recipe.servings?.scalable ? (
+                <ServingAdjuster ingredients={recipe.ingredients} groups={recipe.ingredientGroups} servings={recipe.servings} />
+              ) : (
+                <IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} />
+              )}
+            </section>
           </aside>
           <div className="recipe-main-column">
-            <section className="recipe-section"><div className="section-heading"><span>Sin prisa, pero sin perderse</span><h2>Pasos</h2></div><RecipeSteps steps={recipe.steps} /></section>
+            <section className="recipe-section"><div className="section-heading"><span>Sin prisa, pero sin perderse</span><h2>Pasos</h2></div><RecipeSteps steps={recipe.steps} recipeName={recipe.name} /></section>
             {recipe.warnings && recipe.warnings.length > 0 && <section className="warning-card"><h2><AlertTriangle aria-hidden="true" size={22} /> Advertencias importantes</h2><ul>{recipe.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></section>}
             {recipe.notes && recipe.notes.length > 0 && <section className="content-card"><h2><NotebookPen aria-hidden="true" size={21} /> Notas</h2><ul className="plain-list">{recipe.notes.map((note) => <li key={note}>{note}</li>)}</ul></section>}
             {recipe.variations && recipe.variations.length > 0 && <section className="recipe-section"><div className="section-heading"><span>Por si hoy apetece otra cosa</span><h2>Variaciones</h2></div><div className="variations-grid">{recipe.variations.map((variation) => <article key={variation.name}><h3>{variation.name}</h3><p>{variation.description}</p></article>)}</div></section>}

@@ -1,9 +1,17 @@
 "use client";
 
-import { Pause, Play, RotateCcw, Timer } from "lucide-react";
+import { BellRing, Pause, Play, Plus, RotateCcw, Timer } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-type RecipeTimerProps = { durationSeconds: number; label?: string };
+type RecipeTimerProps = {
+  durationSeconds: number;
+  label?: string;
+  recipeName: string;
+  stepName: string;
+  incrementSeconds?: number;
+  reminderEverySeconds?: number;
+  note?: string;
+};
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -29,14 +37,23 @@ function playCompletionSound() {
   }
 }
 
-export function RecipeTimer({ durationSeconds, label }: RecipeTimerProps) {
+export function RecipeTimer({ durationSeconds, label, recipeName, stepName, incrementSeconds, reminderEverySeconds, note }: RecipeTimerProps) {
   const [remaining, setRemaining] = useState(durationSeconds);
+  const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState<string | null>(null);
   const completedRef = useRef(false);
 
   useEffect(() => {
     if (!running) return;
     const interval = window.setInterval(() => {
+      setElapsed((current) => {
+        const next = current + 1;
+        if (reminderEverySeconds && next % reminderEverySeconds === 0) {
+          setReminderMessage(`Han pasado ${formatTime(next)}: toca remover o revisar.`);
+        }
+        return next;
+      });
       setRemaining((current) => {
         if (current <= 1) {
           window.clearInterval(interval);
@@ -49,11 +66,19 @@ export function RecipeTimer({ durationSeconds, label }: RecipeTimerProps) {
       });
     }, 1000);
     return () => window.clearInterval(interval);
-  }, [running]);
+  }, [reminderEverySeconds, running]);
 
   function reset() {
     setRunning(false);
     setRemaining(durationSeconds);
+    setElapsed(0);
+    setReminderMessage(null);
+    completedRef.current = false;
+  }
+
+  function addTime() {
+    if (!incrementSeconds) return;
+    setRemaining((current) => current + incrementSeconds);
     completedRef.current = false;
   }
 
@@ -62,15 +87,19 @@ export function RecipeTimer({ durationSeconds, label }: RecipeTimerProps) {
     <div className={`timer${finished ? " is-finished" : ""}`} role="timer" aria-live="polite">
       <div className="timer-readout"><Timer aria-hidden="true" size={20} /><span>{formatTime(remaining)}</span></div>
       <div className="timer-copy">
-        <strong>{finished ? "¡Tiempo!" : label ?? "Temporizador sugerido"}</strong>
-        <small>{finished ? "Ya puedes continuar con el siguiente paso." : "Puedes pausarlo y retomarlo cuando quieras."}</small>
+        <strong>{finished ? `Paso terminado: ${stepName}` : label ?? stepName}</strong>
+        <small>{finished ? `${recipeName} · El siguiente paso no se inicia automáticamente.` : recipeName}</small>
       </div>
-      <div className="timer-actions">
+      {note && <p className="timer-note">{note}</p>}
+      {reminderEverySeconds && <p className="timer-reminder"><BellRing aria-hidden="true" size={16} /> Recordatorio cada {formatTime(reminderEverySeconds)}</p>}
+      {reminderMessage && <p className="timer-alert"><BellRing aria-hidden="true" size={17} />{reminderMessage}</p>}
+      <div className={`timer-actions${incrementSeconds ? " has-extra" : ""}`}>
         <button type="button" onClick={() => setRunning((value) => !value)} disabled={finished}>
           {running ? <Pause aria-hidden="true" size={18} /> : <Play aria-hidden="true" size={18} />}
           {running ? "Pausar" : remaining === durationSeconds ? "Iniciar" : "Reanudar"}
         </button>
         <button type="button" onClick={reset}><RotateCcw aria-hidden="true" size={18} /> Reiniciar</button>
+        {incrementSeconds && <button type="button" onClick={addTime}><Plus aria-hidden="true" size={18} /> Añadir {formatTime(incrementSeconds)}</button>}
       </div>
     </div>
   );

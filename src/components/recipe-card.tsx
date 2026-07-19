@@ -20,7 +20,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         <h2><Link href={`/recetas/${recipe.slug}`}>{recipe.name}</Link></h2>
         <p>{recipe.shortDescription}</p>
         <div className="card-meta">
-          <span><Clock3 aria-hidden="true" size={16} />{formatMinutes(recipe.totalTimeMinutes)}</span>
+          <span><Clock3 aria-hidden="true" size={16} />{recipe.totalTimeLabel ?? recipe.cookTimeLabel ?? formatMinutes(recipe.totalTimeMinutes)}</span>
           <span>{formatDifficulty(recipe.difficulty)}</span>
         </div>
         <ul className="tag-list" aria-label="Etiquetas">

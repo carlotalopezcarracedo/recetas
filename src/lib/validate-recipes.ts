@@ -40,6 +40,20 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
     if (recipe.steps.length === 0) {
       issues.push({ recipe: context, message: "La receta no tiene pasos." });
     }
+    if (recipe.servings) {
+      const { amount, min = 1, max = 12, scalable } = recipe.servings;
+      if (amount <= 0 || min <= 0 || max <= 0 || min > max || amount < min || amount > max) {
+        issues.push({ recipe: context, message: "La configuración de raciones es inválida." });
+      }
+      if (
+        scalable &&
+        !recipe.ingredients.some(
+          (ingredient) => ingredient.quantity !== undefined && ingredient.scalable !== false,
+        )
+      ) {
+        issues.push({ recipe: context, message: "La receta se marca como escalable, pero no tiene cantidades numéricas escalables." });
+      }
+    }
     if (!FLAVOR_TYPES.includes(recipe.flavorType)) {
       issues.push({ recipe: context, message: `Tipo de sabor inválido: ${recipe.flavorType}` });
     }
@@ -67,7 +81,29 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       }
     }
 
-    for (const item of [...recipe.ingredients, ...recipe.steps]) {
+    const groupIds = new Set<string>();
+    for (const group of recipe.ingredientGroups ?? []) {
+      if (groupIds.has(group.id)) {
+        issues.push({ recipe: context, message: `Grupo de ingredientes duplicado: ${group.id}` });
+      }
+      groupIds.add(group.id);
+      if (!recipe.ingredients.some((ingredient) => ingredient.groupId === group.id)) {
+        issues.push({ recipe: context, message: `El grupo ${group.id} no contiene ingredientes.` });
+      }
+    }
+    for (const ingredient of recipe.ingredients) {
+      if (ingredient.quantity === undefined && !ingredient.displayQuantity) {
+        issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} no tiene cantidad visible.` });
+      }
+      if (ingredient.quantity !== undefined && ingredient.quantity <= 0) {
+        issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} tiene una cantidad no válida.` });
+      }
+      if (ingredient.groupId && !groupIds.has(ingredient.groupId)) {
+        issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} referencia un grupo inexistente.` });
+      }
+    }
+
+    for (const item of [...recipe.ingredients, ...(recipe.ingredientGroups ?? []), ...recipe.steps]) {
       if (nestedIds.has(item.id)) {
         issues.push({ recipe: context, message: `ID de ingrediente o paso duplicado: ${item.id}` });
       }
@@ -76,6 +112,12 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
     for (const step of recipe.steps) {
       if (step.durationSeconds !== undefined && step.durationSeconds < 0) {
         issues.push({ recipe: context, message: `El paso ${step.id} tiene una duración negativa.` });
+      }
+      if (step.timerIncrementSeconds !== undefined && step.timerIncrementSeconds <= 0) {
+        issues.push({ recipe: context, message: `El paso ${step.id} tiene un incremento de temporizador no válido.` });
+      }
+      if (step.reminderEverySeconds !== undefined && step.reminderEverySeconds <= 0) {
+        issues.push({ recipe: context, message: `El paso ${step.id} tiene un recordatorio no válido.` });
       }
     }
   }

@@ -9,12 +9,37 @@ describe("normalizeText", () => {
 });
 
 describe("filterRecipes", () => {
-  it.each(["avena", "vainilla", "claras", "chocolate", "crepe"])(
+  it.each([
+    "avena",
+    "vainilla",
+    "claras",
+    "chocolate",
+    "crepe",
+    "queso",
+    "maicena",
+    "air fryer",
+    "horno",
+    "Camembert",
+    "postre",
+    "tortilla",
+    "patata",
+    "soja",
+    "brocoli",
+    "espinaca",
+    "calabacin",
+    "cena",
+    "maiz",
+  ])(
     "encuentra resultados para %s",
     (query) => {
       expect(filterRecipes(recipes, query, EMPTY_FILTERS).length).toBeGreaterThan(0);
     },
   );
+
+  it("encuentra las recetas nuevas con texto normalizado", () => {
+    expect(filterRecipes(recipes, "maiz", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("tarta-queso-pequena");
+    expect(filterRecipes(recipes, "brocoli", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("tortilla-patata-soja-texturizada");
+  });
 
   it("combina categoría, tipo y etiqueta", () => {
     const result = filterRecipes(recipes, "", {

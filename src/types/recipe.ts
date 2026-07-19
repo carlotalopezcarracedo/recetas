@@ -18,6 +18,7 @@ export type RecipeIngredient = {
   name: string;
   quantity?: number;
   unit?: string;
+  unitPlural?: string;
   displayQuantity?: string;
   notes?: string;
   optional?: boolean;
@@ -67,6 +68,7 @@ export type Recipe = {
   servings?: {
     amount: number;
     unit: string;
+    unitSingular?: string;
     scalable?: boolean;
     min?: number;
     max?: number;

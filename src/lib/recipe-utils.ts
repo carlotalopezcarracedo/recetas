@@ -33,9 +33,12 @@ function searchableText(recipe: Recipe): string {
       recipe.flavorType,
       ...recipe.tags,
       ...(recipe.keywords ?? []),
+      ...(recipe.ingredientGroups ?? []).flatMap((group) => [group.title, group.instruction]),
       ...recipe.ingredients.flatMap((ingredient) => [
         ingredient.name,
         ingredient.quantity,
+        ingredient.displayQuantity,
+        ingredient.unit,
         ingredient.notes,
       ]),
     ]

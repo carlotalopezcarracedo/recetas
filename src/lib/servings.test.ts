@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { recipes } from "@/data/recipes";
 import {
   adjustServingCount,
   formatKitchenQuantity,
@@ -32,6 +33,18 @@ describe("ajuste de raciones", () => {
     };
     expect(getIngredientQuantityText(cheese, 2)).toBe("250 g");
     expect(getIngredientQuantityText(splash, 2)).toBe("un chorrito");
+  });
+
+  it("duplica correctamente la tarta de dos a cuatro raciones", () => {
+    const recipe = recipes.find((item) => item.slug === "tarta-queso-pequena");
+    const cheese = recipe?.ingredients.find((ingredient) => ingredient.id === "tarta-queso-fresco");
+    const cornstarch = recipe?.ingredients.find((ingredient) => ingredient.id === "tarta-maicena");
+    const vanilla = recipe?.ingredients.find((ingredient) => ingredient.id === "tarta-vainilla");
+    const factor = getScaleFactor(recipe?.servings?.amount ?? 0, 4);
+
+    expect(cheese && getIngredientQuantityText(cheese, factor)).toBe("250 g");
+    expect(cornstarch && getIngredientQuantityText(cornstarch, factor)).toBe("2 cucharaditas de postre");
+    expect(vanilla && getIngredientQuantityText(vanilla, factor)).toBe("un chorrito pequeño");
   });
 
   it("restaura la base y respeta los límites mínimo y máximo", () => {

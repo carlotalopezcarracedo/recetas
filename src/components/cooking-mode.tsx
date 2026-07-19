@@ -70,14 +70,25 @@ export function CookingMode({ recipe }: CookingModeProps) {
           </div>
           <main>
             {showIngredients ? (
-              <section className="cooking-ingredients"><h3>Ingredientes</h3><IngredientList ingredients={recipe.ingredients} compact /></section>
+              <section className="cooking-ingredients"><h3>Ingredientes</h3><IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} compact /></section>
             ) : (
               <section className="cooking-step">
                 <span className="giant-step-number">{stepIndex + 1}</span>
                 <h3>{step.title ?? `Paso ${stepIndex + 1}`}</h3>
                 <p>{step.instruction}</p>
                 {step.warning && <aside><strong>Ojo</strong>{step.warning}</aside>}
-                {step.durationSeconds && <RecipeTimer key={step.id} durationSeconds={step.durationSeconds} label={step.durationSeconds === 240 ? "Temporizador de 4 minutos" : undefined} />}
+                {step.durationSeconds && (
+                  <RecipeTimer
+                    key={step.id}
+                    durationSeconds={step.durationSeconds}
+                    label={step.timerLabel}
+                    recipeName={recipe.name}
+                    stepName={step.title ?? `Paso ${stepIndex + 1}`}
+                    incrementSeconds={step.timerIncrementSeconds}
+                    reminderEverySeconds={step.reminderEverySeconds}
+                    note={step.timerNote}
+                  />
+                )}
               </section>
             )}
           </main>
