@@ -12,8 +12,8 @@ type FilterChipsProps = {
   hasFilters: boolean;
 };
 
-const primaryTagFilters = ["microondas", "horno", "alta en proteína"];
-const extraTagFilters = ["con fruta", "con verduras", "con salsa", "por ciclos", "con acompañamiento", "sartén", "rápida", "vegetariana"];
+const primaryTagFilters = ["microondas", "horno", "air fryer", "preparación base"];
+const extraTagFilters = ["escalable", "requiere balanza", "alta en proteína", "con fruta", "con verduras", "con salsa", "por ciclos", "con acompañamiento", "sartén", "rápida", "vegetariana"];
 
 function titleCase(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);

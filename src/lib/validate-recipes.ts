@@ -2,6 +2,7 @@ import {
   DIFFICULTIES,
   FLAVOR_TYPES,
   MEAL_TYPES,
+  RECIPE_KINDS,
   type Recipe,
 } from "@/types/recipe";
 
@@ -48,7 +49,9 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       if (
         scalable &&
         !recipe.ingredients.some(
-          (ingredient) => ingredient.quantity !== undefined && ingredient.scalable !== false,
+          (ingredient) =>
+            (ingredient.quantity !== undefined || ingredient.quantityRange !== undefined) &&
+            ingredient.scalable !== false,
         )
       ) {
         issues.push({ recipe: context, message: "La receta se marca como escalable, pero no tiene cantidades numéricas escalables." });
@@ -59,6 +62,12 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
     }
     if (!DIFFICULTIES.includes(recipe.difficulty)) {
       issues.push({ recipe: context, message: `Dificultad inválida: ${recipe.difficulty}` });
+    }
+    if (recipe.recipeKind && !RECIPE_KINDS.includes(recipe.recipeKind)) {
+      issues.push({ recipe: context, message: `Tipo de receta inválido: ${recipe.recipeKind}` });
+    }
+    if (recipe.requiresScale && !recipe.tools.some((tool) => /balanza|báscula/i.test(tool))) {
+      issues.push({ recipe: context, message: "La receta requiere balanza, pero no la incluye entre los utensilios." });
     }
     for (const mealType of recipe.mealTypes) {
       if (!MEAL_TYPES.includes(mealType)) {
@@ -106,17 +115,37 @@ export function validateRecipes(recipes: Recipe[]): ValidationIssue[] {
       }
     }
     for (const ingredient of recipe.ingredients) {
-      if (ingredient.quantity === undefined && !ingredient.displayQuantity) {
+      if (ingredient.quantity === undefined && ingredient.quantityRange === undefined && !ingredient.displayQuantity) {
         issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} no tiene cantidad visible.` });
       }
       if (ingredient.quantity !== undefined && ingredient.quantity <= 0) {
         issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} tiene una cantidad no válida.` });
+      }
+      if (
+        ingredient.quantityRange &&
+        (ingredient.quantityRange.min <= 0 ||
+          ingredient.quantityRange.max <= 0 ||
+          ingredient.quantityRange.min > ingredient.quantityRange.max)
+      ) {
+        issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} tiene un rango no válido.` });
       }
       if (ingredient.groupId && !groupIds.has(ingredient.groupId)) {
         issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} referencia un grupo inexistente.` });
       }
       if (ingredient.sectionId && !ingredientSectionIds.has(ingredient.sectionId)) {
         issues.push({ recipe: context, message: `El ingrediente ${ingredient.id} referencia una sección inexistente.` });
+      }
+    }
+
+    if (recipe.proportionGuide) {
+      const ingredientIds = new Set(recipe.ingredients.map((ingredient) => ingredient.id));
+      if (recipe.proportionGuide.servings.some((servings) => servings <= 0)) {
+        issues.push({ recipe: context, message: "La guía de proporciones contiene raciones no válidas." });
+      }
+      for (const column of recipe.proportionGuide.columns) {
+        if (!ingredientIds.has(column.ingredientId)) {
+          issues.push({ recipe: context, message: `La guía de proporciones referencia un ingrediente inexistente: ${column.ingredientId}` });
+        }
       }
     }
 

@@ -1,10 +1,14 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CircleCheckBig, CookingPot, ListChecks, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleCheckBig, CookingPot, ListChecks, Minus, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IngredientList } from "@/components/ingredient-list";
+import { PrecisionNotice } from "@/components/precision-notice";
+import { ProportionTable } from "@/components/proportion-table";
+import { useRecipeExperience } from "@/components/recipe-experience";
 import { RecipeTimer } from "@/components/recipe-timer";
 import { RepeatableStep } from "@/components/repeatable-step";
+import { adjustServingCount } from "@/lib/servings";
 import type { Recipe } from "@/types/recipe";
 
 type CookingModeProps = { recipe: Recipe };
@@ -16,6 +20,7 @@ export function CookingMode({ recipe }: CookingModeProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const { selectedServings, scaleFactor, changeServings, startCooking } = useRecipeExperience();
 
   useEffect(() => {
     if (!open) return;
@@ -65,9 +70,23 @@ export function CookingMode({ recipe }: CookingModeProps) {
     }
   }
 
+  function openCookingMode() {
+    startCooking();
+    setOpen(true);
+  }
+
+  function adjustServings(action: "increment" | "decrement") {
+    if (!recipe.servings) return;
+    changeServings(adjustServingCount(selectedServings, action, {
+      base: recipe.servings.amount,
+      min: recipe.servings.min,
+      max: recipe.servings.max,
+    }));
+  }
+
   return (
     <>
-      <button ref={triggerRef} type="button" className="primary-button cook-mode-trigger" onClick={() => setOpen(true)}><CookingPot aria-hidden="true" size={20} /> Activar modo cocina</button>
+      <button ref={triggerRef} type="button" className="primary-button cook-mode-trigger" onClick={openCookingMode}><CookingPot aria-hidden="true" size={20} /> Activar modo cocina</button>
       {open && (
         <div ref={dialogRef} className={`cooking-mode${recipe.stepSections && recipe.stepSections.length > 1 ? " has-section-nav" : ""}`} role="dialog" aria-modal="true" aria-labelledby="cooking-title">
           <header>
@@ -76,7 +95,16 @@ export function CookingMode({ recipe }: CookingModeProps) {
           </header>
           <div className="cooking-progress" aria-label={`Paso ${stepIndex + 1} de ${recipe.steps.length}`}>
             <span>{currentSection ? `${currentSection.title} · ` : ""}Paso {stepIndex + 1} de {recipe.steps.length}</span>
-            <div><span style={{ width: `${((stepIndex + 1) / recipe.steps.length) * 100}%` }} /></div>
+            <div className="cooking-progress-bar"><span style={{ width: `${((stepIndex + 1) / recipe.steps.length) * 100}%` }} /></div>
+            {recipe.servings && (
+              <div className="cooking-servings">
+                <span>Raciones activas</span>
+                {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("decrement")} disabled={selectedServings <= (recipe.servings?.min ?? 1)} aria-label="Reducir raciones durante el modo cocina"><Minus aria-hidden="true" size={16} /></button>}
+                <strong>{selectedServings}</strong>
+                {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("increment")} disabled={selectedServings >= (recipe.servings?.max ?? 12)} aria-label="Aumentar raciones durante el modo cocina"><Plus aria-hidden="true" size={16} /></button>}
+              </div>
+            )}
+            <PrecisionNotice recipe={recipe} compact />
           </div>
           {recipe.stepSections && recipe.stepSections.length > 1 && (
             <nav className="cooking-sections" aria-label="Secciones de la receta">
@@ -86,7 +114,11 @@ export function CookingMode({ recipe }: CookingModeProps) {
             </nav>
           )}
           <main>
-            <section className="cooking-ingredients" hidden={!showIngredients}><h3>Ingredientes</h3><IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} compact /></section>
+            <section className="cooking-ingredients" hidden={!showIngredients}>
+              <h3>Ingredientes</h3>
+              <IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} scaleFactor={scaleFactor} compact />
+              {recipe.proportionGuide && recipe.servings && <ProportionTable ingredients={recipe.ingredients} baseServings={recipe.servings.amount} guide={recipe.proportionGuide} compact />}
+            </section>
             <section className="cooking-step" hidden={showIngredients}>
                 <span className="giant-step-number">{stepIndex + 1}</span>
                 {currentSection && <span className="cooking-section-label">{currentSection.title}</span>}

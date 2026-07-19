@@ -2,6 +2,7 @@ import { Clock3, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { FavoriteButton } from "@/components/favorite-button";
 import { RecipeImage } from "@/components/recipe-image";
+import { RecipeBadges } from "@/components/recipe-badges";
 import { formatDifficulty, formatMinutes } from "@/lib/recipe-utils";
 import type { Recipe } from "@/types/recipe";
 
@@ -17,6 +18,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           <span>{recipe.mealTypes.slice(0, 2).join(" · ")}</span>
           {recipe.isFeatured && <span className="featured-label"><Sparkles aria-hidden="true" size={13} /> Destacada</span>}
         </div>
+        <RecipeBadges recipe={recipe} compact />
         <h2><Link href={`/recetas/${recipe.slug}`}>{recipe.name}</Link></h2>
         <p>{recipe.shortDescription}</p>
         <div className="card-meta">

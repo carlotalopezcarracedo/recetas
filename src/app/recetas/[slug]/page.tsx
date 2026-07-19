@@ -4,11 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IngredientList } from "@/components/ingredient-list";
 import { RecipeActions } from "@/components/recipe-actions";
+import { RecipeBadges } from "@/components/recipe-badges";
+import { RecipeExperienceProvider } from "@/components/recipe-experience";
 import { RecipeImage } from "@/components/recipe-image";
 import { RecipeHighlights } from "@/components/recipe-highlights";
 import { RecipeMeta } from "@/components/recipe-meta";
 import { RecipeSteps } from "@/components/recipe-steps";
 import { ServingAdjuster } from "@/components/serving-adjuster";
+import { PrecisionNotice } from "@/components/precision-notice";
 import { VersionBadge } from "@/components/version-badge";
 import { SITE_CONFIG, SITE_URL } from "@/config/site";
 import { getRecipeBySlug, recipes } from "@/data/recipes";
@@ -70,17 +73,20 @@ export default async function RecipePage({ params }: RecipePageProps) {
     <main className="shell recipe-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
       <Link href="/" className="back-link"><ArrowLeft aria-hidden="true" size={18} /> Volver a las recetas</Link>
+      <RecipeExperienceProvider recipe={recipe}>
       <article>
         <div className="recipe-hero-grid">
           <RecipeImage {...recipe} priority />
           <div className="recipe-heading">
             <div className="eyebrow-row"><span>{recipe.mealTypes.join(" · ")}</span><VersionBadge version={recipe.version} /></div>
+            <RecipeBadges recipe={recipe} />
             <h1>{recipe.name}</h1>
             <p>{recipe.description ?? recipe.shortDescription}</p>
             <ul className="tag-list" aria-label="Etiquetas">{recipe.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
             <RecipeActions recipe={recipe} />
           </div>
         </div>
+        <PrecisionNotice recipe={recipe} />
         <RecipeMeta {...recipe} />
         <RecipeHighlights {...recipe} />
         <div className="recipe-body-grid">
@@ -89,7 +95,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
             <section className="content-card ingredient-card">
               <h2>Ingredientes</h2>
               {recipe.servings?.scalable ? (
-                <ServingAdjuster ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} servings={recipe.servings} />
+                <ServingAdjuster ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} servings={recipe.servings} proportionGuide={recipe.proportionGuide} servingScaleNote={recipe.servingScaleNote} />
               ) : (
                 <IngredientList ingredients={recipe.ingredients} groups={recipe.ingredientGroups} sections={recipe.ingredientSections} />
               )}
@@ -99,11 +105,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
             <section className="recipe-section"><div className="section-heading"><span>Sin prisa, pero sin perderse</span><h2>Pasos</h2></div><RecipeSteps steps={recipe.steps} sections={recipe.stepSections} recipeName={recipe.name} /></section>
             {recipe.warnings && recipe.warnings.length > 0 && <section className="warning-card"><h2><AlertTriangle aria-hidden="true" size={22} /> Advertencias importantes</h2><ul>{recipe.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></section>}
             {recipe.notes && recipe.notes.length > 0 && <section className="content-card"><h2><NotebookPen aria-hidden="true" size={21} /> Notas</h2><ul className="plain-list">{recipe.notes.map((note) => <li key={note}>{note}</li>)}</ul></section>}
+            {recipe.howToUse && recipe.howToUse.length > 0 && <section className="recipe-section how-to-use"><div className="section-heading"><span>Una base, varios platos</span><h2>Cómo utilizarla</h2></div><div className="use-cases-grid">{recipe.howToUse.map((item) => <article key={item.title}><h3>{item.title}</h3><p>{item.description}</p></article>)}</div></section>}
             {recipe.variations && recipe.variations.length > 0 && <section className="recipe-section"><div className="section-heading"><span>Por si hoy apetece otra cosa</span><h2>Variaciones</h2></div><div className="variations-grid">{recipe.variations.map((variation) => <article key={variation.name}><h3>{variation.name}</h3><p>{variation.description}</p></article>)}</div></section>}
           </div>
         </div>
         <footer className="recipe-version"><VersionBadge version={recipe.version} /><p>Última actualización: <time dateTime={recipe.lastUpdated}>{formatDate(recipe.lastUpdated)}</time></p></footer>
       </article>
+      </RecipeExperienceProvider>
     </main>
   );
 }

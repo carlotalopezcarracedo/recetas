@@ -8,15 +8,29 @@ export const MEAL_TYPES = [
 
 export const FLAVOR_TYPES = ["dulce", "salado"] as const;
 export const DIFFICULTIES = ["muy-facil", "facil", "media", "dificil"] as const;
+export const RECIPE_KINDS = [
+  "plato-completo",
+  "preparacion-base",
+  "salsa",
+  "acompanamiento",
+  "masa",
+  "postre",
+  "bebida",
+] as const;
 
 export type MealType = (typeof MEAL_TYPES)[number];
 export type FlavorType = (typeof FLAVOR_TYPES)[number];
 export type Difficulty = (typeof DIFFICULTIES)[number];
+export type RecipeKind = (typeof RECIPE_KINDS)[number];
 
 export type RecipeIngredient = {
   id: string;
   name: string;
   quantity?: number;
+  quantityRange?: {
+    min: number;
+    max: number;
+  };
   unit?: string;
   unitPlural?: string;
   displayQuantity?: string;
@@ -81,6 +95,9 @@ export type Recipe = {
   imageAlt?: string;
   mealTypes: MealType[];
   flavorType: FlavorType;
+  recipeKind?: RecipeKind;
+  requiresScale?: boolean;
+  precisionWarning?: string;
   tags: string[];
   keywords?: string[];
   prepTimeMinutes?: number;
@@ -104,6 +121,18 @@ export type Recipe = {
   ingredientSections?: IngredientSection[];
   steps: RecipeStep[];
   stepSections?: StepSection[];
+  proportionGuide?: {
+    servings: number[];
+    columns: Array<{
+      ingredientId: string;
+      label: string;
+    }>;
+  };
+  servingScaleNote?: string;
+  howToUse?: Array<{
+    title: string;
+    description: string;
+  }>;
   restTimeLabel?: string;
   refrigerationTimeLabel?: string;
   recommendedAppliances?: string[];

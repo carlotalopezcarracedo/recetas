@@ -54,6 +54,12 @@ export function getIngredientQuantityText(
   ingredient: RecipeIngredient,
   scaleFactor = 1,
 ): string {
+  if (ingredient.quantityRange) {
+    const factor = ingredient.scalable === false ? 1 : scaleFactor;
+    const min = formatKitchenQuantity(ingredient.quantityRange.min * factor);
+    const max = formatKitchenQuantity(ingredient.quantityRange.max * factor);
+    return `${min}–${max}${ingredient.unit ? ` ${ingredient.unit}` : ""}`;
+  }
   if (ingredient.quantity !== undefined && ingredient.scalable !== false) {
     const scaledQuantity = ingredient.quantity * scaleFactor;
     const formatted = formatKitchenQuantity(scaledQuantity);
@@ -68,5 +74,5 @@ export function getIngredientQuantityText(
 }
 
 export function isIngredientScalable(ingredient: RecipeIngredient): boolean {
-  return ingredient.quantity !== undefined && ingredient.scalable !== false;
+  return (ingredient.quantity !== undefined || ingredient.quantityRange !== undefined) && ingredient.scalable !== false;
 }

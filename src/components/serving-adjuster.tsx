@@ -1,9 +1,10 @@
 "use client";
 
 import { Minus, Plus, RotateCcw, Scale, TriangleAlert } from "lucide-react";
-import { useState } from "react";
 import { IngredientList } from "@/components/ingredient-list";
-import { adjustServingCount, getScaleFactor } from "@/lib/servings";
+import { ProportionTable } from "@/components/proportion-table";
+import { useRecipeExperience } from "@/components/recipe-experience";
+import { adjustServingCount } from "@/lib/servings";
 import type { IngredientGroup, IngredientSection, Recipe, RecipeIngredient } from "@/types/recipe";
 
 type ServingAdjusterProps = {
@@ -11,21 +12,22 @@ type ServingAdjusterProps = {
   groups?: IngredientGroup[];
   sections?: IngredientSection[];
   servings: NonNullable<Recipe["servings"]>;
+  proportionGuide?: Recipe["proportionGuide"];
+  servingScaleNote?: string;
 };
 
 function getServingLabel(value: number, servings: NonNullable<Recipe["servings"]>): string {
   return value === 1 ? (servings.unitSingular ?? servings.unit) : servings.unit;
 }
 
-export function ServingAdjuster({ ingredients, groups, sections, servings }: ServingAdjusterProps) {
-  const [selectedServings, setSelectedServings] = useState(servings.amount);
+export function ServingAdjuster({ ingredients, groups, sections, servings, proportionGuide, servingScaleNote }: ServingAdjusterProps) {
+  const { selectedServings, scaleFactor, changeServings } = useRecipeExperience();
   const limits = { base: servings.amount, min: servings.min, max: servings.max };
-  const factor = getScaleFactor(servings.amount, selectedServings);
   const min = servings.min ?? 1;
   const max = servings.max ?? 12;
 
   function adjust(action: "increment" | "decrement" | "reset") {
-    setSelectedServings((current) => adjustServingCount(current, action, limits));
+    changeServings(adjustServingCount(selectedServings, action, limits));
   }
 
   return (
@@ -53,7 +55,9 @@ export function ServingAdjuster({ ingredients, groups, sections, servings }: Ser
         <RotateCcw aria-hidden="true" size={16} /> Recuperar cantidad original
       </button>
       <p className="scaling-warning"><TriangleAlert aria-hidden="true" size={18} />Las cantidades se ajustan automáticamente, pero el recipiente, el tiempo de cocción y el aparato pueden necesitar cambios.</p>
-      <IngredientList ingredients={ingredients} groups={groups} sections={sections} scaleFactor={factor} />
+      {servingScaleNote && <p className="batch-warning"><TriangleAlert aria-hidden="true" size={18} />{servingScaleNote}</p>}
+      <IngredientList ingredients={ingredients} groups={groups} sections={sections} scaleFactor={scaleFactor} />
+      {proportionGuide && <ProportionTable ingredients={ingredients} baseServings={servings.amount} guide={proportionGuide} />}
     </div>
   );
 }
