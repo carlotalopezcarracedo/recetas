@@ -12,6 +12,11 @@ export const recipeTemplate: Recipe = {
   // imageAlt: "Descripción accesible de la fotografía",
   mealTypes: ["comida"],
   flavorType: "salado",
+  // Usa "preparacion-base" para masas, salsas o bases reutilizables.
+  recipeKind: "plato-completo",
+  // Activa ambos campos cuando sea imprescindible medir en gramos.
+  requiresScale: false,
+  // precisionWarning: "Explica qué proporción no debe alterarse.",
   tags: ["rápida"],
   keywords: [],
   prepTimeMinutes: 0,
@@ -24,6 +29,8 @@ export const recipeTemplate: Recipe = {
   ingredients: [
     // Cantidad exacta: se recalcula automáticamente.
     { id: "ingrediente-exacto", quantity: 125, unit: "g", name: "Ingrediente exacto", sectionId: "base" },
+    // Un rango comprobado también se escala de forma exacta.
+    { id: "ingrediente-rango", quantityRange: { min: 7, max: 8 }, unit: "g", name: "Ingrediente con margen", sectionId: "base" },
     // Cantidad aproximada: nunca se convierte falsamente en un número.
     { id: "ingrediente-aproximado", displayQuantity: "un chorrito", name: "Ingrediente aproximado", scalable: false, sectionId: "base" },
     // Alternativa dentro del grupo declarado abajo.
@@ -36,6 +43,15 @@ export const recipeTemplate: Recipe = {
   ingredientGroups: [
     { id: "alternativas", title: "Escoge una alternativa", instruction: "No se utilizan todas a la vez.", selection: "one" },
   ],
+  // Para preparaciones con proporciones sensibles, genera una tabla sin duplicar datos.
+  proportionGuide: {
+    servings: [1, 2, 3, 4],
+    columns: [
+      { ingredientId: "ingrediente-exacto", label: "Ingrediente" },
+      { ingredientId: "ingrediente-rango", label: "Margen" },
+    ],
+  },
+  servingScaleNote: "Al aumentar raciones, revisa si necesitas trabajar en tandas. Los tiempos no se multiplican.",
   steps: [
     {
       id: "paso-id-unico",
@@ -63,6 +79,9 @@ export const recipeTemplate: Recipe = {
   notes: [],
   warnings: [],
   variations: [],
+  howToUse: [
+    { title: "Como base", description: "Explica con qué plato combina o cómo terminarla." },
+  ],
   isFeatured: false,
   version: "1.0",
   lastUpdated: "AAAA-MM-DD",

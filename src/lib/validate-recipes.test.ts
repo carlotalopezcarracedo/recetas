@@ -14,6 +14,22 @@ describe("validateRecipes", () => {
     expect(slugs).toContain("tortilla-patata-soja-texturizada");
     expect(slugs).toContain("bol-avena-fruta-frutos-secos");
     expect(slugs).toContain("bolitas-soja-texturizada-verdura");
+    expect(slugs).toContain("noquis-caseros-patata");
+  });
+
+  it("modela los ñoquis como preparación base precisa y escalable", () => {
+    const gnocchi = recipes.find((recipe) => recipe.slug === "noquis-caseros-patata");
+    const riceFlour = gnocchi?.ingredients.find((ingredient) => ingredient.id === "noquis-harina-arroz");
+
+    expect(gnocchi?.recipeKind).toBe("preparacion-base");
+    expect(gnocchi?.requiresScale).toBe(true);
+    expect(gnocchi?.servings).toMatchObject({ amount: 1, min: 1, max: 8, scalable: true });
+    expect(riceFlour?.quantityRange).toEqual({ min: 7, max: 8 });
+    expect(gnocchi?.proportionGuide?.servings).toEqual([1, 2, 3, 4]);
+    expect(gnocchi?.steps.some((step) => step.durationSeconds === 180)).toBe(true);
+    expect(gnocchi?.steps.some((step) => step.durationSeconds === 1200 && step.reminderEverySeconds === 600)).toBe(true);
+    expect(gnocchi?.warnings?.some((warning) => warning.includes("arepas"))).toBe(true);
+    expect(gnocchi?.howToUse?.length).toBeGreaterThanOrEqual(4);
   });
 
   it("representa los ciclos de avena sin inventar una cantidad de claras", () => {

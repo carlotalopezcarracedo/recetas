@@ -1,6 +1,6 @@
 # Las recetas de Carlota
 
-Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, ajustar raciones, organizar ingredientes y pasos por secciones, contar ciclos repetidos, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
+Recetario personal público, mobile-first y pensado para consultar mientras se cocina. Guarda recetas locales tipadas, permite buscar y combinar filtros, ajustar raciones y rangos, distinguir platos de preparaciones base, organizar ingredientes y pasos por secciones, contar ciclos repetidos, marcar favoritas, usar un modo cocina paso a paso y lanzar temporizadores sugeridos.
 
 > “Las versiones definitivas. Hasta que las vuelva a cambiar.”
 
@@ -101,6 +101,16 @@ Una medida aproximada se mantiene como texto y debe marcarse como no escalable:
 ```
 
 No conviertas “pizca”, “al gusto”, “tres dedos” o “cantidad necesaria” en cifras inventadas. El selector conserva esos textos y avisa de que deben ajustarse proporcionalmente.
+
+También se admite un intervalo exacto mediante `quantityRange`. Por ejemplo, los ñoquis usan `7–8 g` de harina por ración y muestran automáticamente `14–16 g`, `21–24 g` y `28–32 g` para dos, tres y cuatro raciones.
+
+## Preparaciones base y recetas de precisión
+
+Una masa, salsa o base reutilizable puede declarar `recipeKind: "preparacion-base"` y explicar sus destinos mediante `howToUse`. Si la receta depende de proporciones precisas, activa `requiresScale`, incluye una balanza en `tools` y añade `precisionWarning`. La interfaz mostrará “Preparación base”, “Requiere balanza” y “Escalable” tanto en el listado como en la ficha.
+
+`proportionGuide` genera una tabla de raciones desde los mismos ingredientes; no se copian cantidades manualmente. La receta `noquis-caseros-patata` incluye la tabla completa de una a cuatro raciones, dos harinas alternativas y una guía de uso como acompañamiento, ensalada o bowl.
+
+En esa receta la sal está documentada provisionalmente como `1 g` por ración para que sea fácil corregirla cuando se confirme. Al ampliar raciones puede ser necesario trabajar en varias tandas: el selector recalcula ingredientes, pero nunca multiplica automáticamente el tiempo ni la temperatura.
 
 Importante: aumentar raciones solo recalcula ingredientes numéricos. Nunca multiplica automáticamente tiempos, temperatura, tamaño del recipiente ni capacidad del aparato. En la tarta, cuatro raciones probablemente requieren horno y un molde mayor aunque los ingredientes se dupliquen exactamente.
 

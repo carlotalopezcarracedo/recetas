@@ -139,7 +139,7 @@ button { color: inherit; }
 .favorite-button.is-compact { width: 44px; padding: 0; border-radius: 50%; background: color-mix(in srgb, var(--surface) 90%, transparent); box-shadow: 0 5px 14px rgba(50,30,15,.15); }
 .favorite-button.is-active { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 .recipe-card-body { padding: 1.15rem; }
-.recipe-badges { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .8rem; }
+.recipe-badges { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .8rem; padding: 0; list-style: none; }
 .recipe-badge { min-height: 30px; display: inline-flex; align-items: center; gap: .35rem; padding: .36rem .58rem; border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line)); border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); font-size: .7rem; font-weight: 760; }
 .recipe-badges.is-compact { position: relative; z-index: 2; margin-top: .75rem; }
 .recipe-badges.is-compact .recipe-badge { min-height: 27px; padding: .28rem .48rem; font-size: .65rem; }
@@ -200,7 +200,10 @@ button { color: inherit; }
 .recipe-highlights strong { font-size: .78rem; }
 .recipe-highlights small { color: var(--muted); font-size: .72rem; }
 .precision-notice { display: grid; grid-template-columns: auto 1fr; gap: .8rem; margin: 1.5rem 0 3rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: var(--radius-md); background: linear-gradient(135deg, var(--accent-soft), var(--surface)); }
-.precision-notice > svg { color: var(--accent); }
+.precision-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: var(--surface); color: var(--accent); box-shadow: 0 4px 12px rgba(67, 44, 28, .06); }
+.precision-notice > div > span { display: block; margin-bottom: .18rem; color: var(--accent); font-size: .68rem; font-weight: 820; letter-spacing: .1em; text-transform: uppercase; }
+.precision-notice p { display: flex; align-items: flex-start; gap: .35rem; }
+.precision-notice p svg { flex: 0 0 auto; margin-top: .08rem; }
 .precision-notice strong { display: block; font-size: .92rem; }
 .precision-notice p { margin: .24rem 0 0; color: var(--muted); font-size: .82rem; }
 .precision-notice.is-compact { margin: .6rem 0 0; padding: .65rem .75rem; border-radius: 12px; }
@@ -248,6 +251,8 @@ button { color: inherit; }
 .scaling-warning svg { flex: 0 0 auto; margin-top: .08rem; }
 .batch-warning { margin: 0; padding: .75rem; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--accent-soft); color: var(--muted); font-size: .75rem; line-height: 1.45; }
 .proportion-guide { display: grid; gap: .7rem; min-width: 0; padding-top: .25rem; }
+.proportion-guide > header { display: flex; align-items: flex-start; gap: .55rem; }
+.proportion-guide > header > svg { flex: 0 0 auto; color: var(--accent); }
 .proportion-guide header h3 { margin: 0; font-size: .9rem; }
 .proportion-guide header p { margin: .2rem 0 0; color: var(--muted); font-size: .73rem; }
 .proportion-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; scrollbar-width: thin; }

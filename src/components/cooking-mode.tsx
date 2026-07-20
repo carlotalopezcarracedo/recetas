@@ -99,9 +99,11 @@ export function CookingMode({ recipe }: CookingModeProps) {
             {recipe.servings && (
               <div className="cooking-servings">
                 <span>Raciones activas</span>
-                {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("decrement")} disabled={selectedServings <= (recipe.servings?.min ?? 1)} aria-label="Reducir raciones durante el modo cocina"><Minus aria-hidden="true" size={16} /></button>}
-                <strong>{selectedServings}</strong>
-                {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("increment")} disabled={selectedServings >= (recipe.servings?.max ?? 12)} aria-label="Aumentar raciones durante el modo cocina"><Plus aria-hidden="true" size={16} /></button>}
+                <div>
+                  {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("decrement")} disabled={selectedServings <= (recipe.servings?.min ?? 1)} aria-label="Reducir raciones durante el modo cocina"><Minus aria-hidden="true" size={16} /></button>}
+                  <output aria-live="polite">{selectedServings} {selectedServings === 1 ? (recipe.servings.unitSingular ?? recipe.servings.unit) : recipe.servings.unit}</output>
+                  {recipe.servings.scalable && <button type="button" onClick={() => adjustServings("increment")} disabled={selectedServings >= (recipe.servings?.max ?? 12)} aria-label="Aumentar raciones durante el modo cocina"><Plus aria-hidden="true" size={16} /></button>}
+                </div>
               </div>
             )}
             <PrecisionNotice recipe={recipe} compact />

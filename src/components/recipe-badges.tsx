@@ -21,7 +21,7 @@ export function RecipeBadges({ recipe, compact = false }: { recipe: Recipe; comp
   if (badges.length === 0) return null;
   return (
     <ul className={`recipe-badges${compact ? " is-compact" : ""}`} aria-label="Características de la receta">
-      {badges.map(({ label, icon: Icon }) => <li key={label}><Icon aria-hidden="true" size={compact ? 13 : 15} />{label}</li>)}
+      {badges.map(({ label, icon: Icon }) => <li className="recipe-badge" key={label}><Icon aria-hidden="true" size={compact ? 13 : 15} />{label}</li>)}
     </ul>
   );
 }

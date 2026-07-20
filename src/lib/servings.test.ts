@@ -53,4 +53,23 @@ describe("ajuste de raciones", () => {
     expect(adjustServingCount(1, "decrement", limits)).toBe(1);
     expect(adjustServingCount(8, "increment", limits)).toBe(8);
   });
+
+  it("escala de forma exacta los rangos de los ñoquis", () => {
+    const recipe = recipes.find((item) => item.slug === "noquis-caseros-patata");
+    const flakes = recipe?.ingredients.find((ingredient) => ingredient.id === "noquis-copos");
+    const water = recipe?.ingredients.find((ingredient) => ingredient.id === "noquis-agua");
+    const salt = recipe?.ingredients.find((ingredient) => ingredient.id === "noquis-sal");
+    const flour = recipe?.ingredients.find((ingredient) => ingredient.id === "noquis-harina-arroz");
+    const turmeric = recipe?.ingredients.find((ingredient) => ingredient.id === "noquis-curcuma");
+
+    expect(flakes && getIngredientQuantityText(flakes, 2)).toBe("40 g");
+    expect(water && getIngredientQuantityText(water, 3)).toBe("210 g");
+    expect(salt && getIngredientQuantityText(salt, 4)).toBe("4 g");
+    expect(flour).toBeDefined();
+    expect(turmeric).toBeDefined();
+    expect([1, 2, 3, 4].map((servings) =>
+      flour && getIngredientQuantityText(flour, getScaleFactor(1, servings)),
+    )).toEqual(["7–8 g", "14–16 g", "21–24 g", "28–32 g"]);
+    expect(turmeric && getIngredientQuantityText(turmeric, 4)).toBe("una pizca");
+  });
 });

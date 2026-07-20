@@ -36,6 +36,16 @@ describe("filterRecipes", () => {
     "mazorca",
     "aguacate",
     "curcuma",
+    "noquis",
+    "copos de patata",
+    "harina de arroz",
+    "maicena",
+    "acompanamiento",
+    "ensalada",
+    "bowl",
+    "preparacion base",
+    "balanza",
+    "gramos",
   ])(
     "encuentra resultados para %s",
     (query) => {
@@ -50,6 +60,12 @@ describe("filterRecipes", () => {
     expect(filterRecipes(recipes, "curcuma", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
     expect(filterRecipes(recipes, "falafel", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
     expect(filterRecipes(recipes, "maiz", EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("bolitas-soja-texturizada-verdura");
+  });
+
+  it("encuentra los ñoquis por nombre, uso, ingrediente y requisitos de precisión", () => {
+    for (const query of ["noquis", "copos patata", "harina arroz", "ensalada", "preparacion base", "balanza"]) {
+      expect(filterRecipes(recipes, query, EMPTY_FILTERS).map((recipe) => recipe.slug)).toContain("noquis-caseros-patata");
+    }
   });
 
   it("combina categoría, tipo y etiqueta", () => {

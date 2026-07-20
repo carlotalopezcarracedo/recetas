@@ -7,7 +7,12 @@ Las recetas se editan en `src/data/recipes.ts` usando el tipo `Recipe` de `src/t
 - Usa un `id` y un `slug` únicos; el slug solo admite minúsculas, números y guiones.
 - Usa IDs únicos también en cada ingrediente y paso.
 - Usa `quantity` numérico y `unit` para cantidades exactas escalables.
+- Usa `quantityRange: { min, max }` cuando ambos extremos estén comprobados; el selector escalará el rango completo.
 - Usa `displayQuantity` y `scalable: false` para medidas aproximadas.
+- Declara `recipeKind: "preparacion-base"` para masas, salsas y bases reutilizables, y añade `howToUse` para explicar sus destinos.
+- Si la proporción exige gramos, usa `requiresScale: true`, incluye una balanza en `tools` y redacta `precisionWarning`.
+- Añade `proportionGuide` solo con IDs de ingredientes numéricos o por rango; la tabla se calcula desde la misma fuente de datos.
+- Avisa en `servingScaleNote` si hacen falta tandas: los ingredientes cambian, pero los tiempos no se multiplican automáticamente.
 - Marca con `optional: true` cualquier ingrediente prescindible.
 - Usa `ingredientGroups` y `groupId` cuando se deba escoger una alternativa, no todas.
 - Usa `ingredientSections`/`stepSections` y `sectionId` para separar preparación principal, acompañamiento y salsa.

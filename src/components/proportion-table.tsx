@@ -25,7 +25,7 @@ export function ProportionTable({ ingredients, baseServings, guide, compact = fa
         </div>
       </header>
       <div className="proportion-table-wrap">
-        <table>
+        <table className="proportion-table">
           <thead>
             <tr>
               <th scope="col">Raciones</th>
