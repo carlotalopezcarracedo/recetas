@@ -12,6 +12,8 @@ export const recipes: Recipe[] = [
       "Un bizcocho individual, rápido y personalizable que queda mejor cuando se respetan el bol, la potencia y los cuatro minutos exactos.",
     description:
       "La versión afinada del bizcocho exprés de casa: una sola ración, pocos utensilios y cuatro minutos de cocción sin negociar.",
+    image: "/images/recipes/bizcocho-microondas.png",
+    imageAlt: "Bizcocho de microondas esponjoso servido en un bol blanco y cubierto con pistachos troceados",
     mealTypes: ["desayuno", "merienda", "postre"],
     flavorType: "dulce",
     tags: ["rápida", "microondas", "alta en proteína", "personalizable"],
@@ -132,6 +134,8 @@ export const recipes: Recipe[] = [
       "Crepes finas hechas con una masa muy sencilla y una sartén bien caliente. El secreto está en engrasar toda la superficie y mover rápido la masa.",
     description:
       "Una masa rápida de shaker y una sartén bien preparada. La primera crepe hace de comité de calibración; las demás ya salen con ventaja.",
+    image: "/images/recipes/crepes-caseras.png",
+    imageAlt: "Pila de crepes caseras finas y doradas servidas en un plato blanco",
     mealTypes: ["desayuno", "merienda", "postre"],
     flavorType: "dulce",
     tags: ["sartén", "rápida", "personalizable"],
@@ -253,6 +257,8 @@ export const recipes: Recipe[] = [
       "Una tarta de queso pequeña y cremosa para una o dos personas, preparada en air fryer u horno y mucho mejor después de pasar la noche en la nevera.",
     description:
       "Una tarta compacta y cremosa, probada para dos personas. Cabe holgadamente en la air fryer en su versión base; si aumenta el volumen, el horno y un molde mayor suelen ser la opción sensata.",
+    image: "/images/recipes/tarta-queso-pequena.png",
+    imageAlt: "Tarta de queso pequeña horneada y dorada dentro de su papel de horno",
     mealTypes: ["merienda", "postre"],
     flavorType: "dulce",
     tags: ["air fryer", "horno", "alta en proteína", "escalable", "preparar con antelación"],
@@ -480,6 +486,8 @@ export const recipes: Recipe[] = [
       "Una tortilla individual de patata, soja texturizada y verdura, cocinada primero en air fryer y terminada lentamente en sartén para que quede compacta y esponjosa.",
     description:
       "Una tortilla individual con patata dorada en air fryer, soja fina y una verdura a elegir. El reposo tapado y una sartén pequeña le dan estructura sin convertirla en una suela.",
+    image: "/images/recipes/tortilla-patata-soja-texturizada.png",
+    imageAlt: "Tortilla de patata con verduras cortada para mostrar su interior",
     mealTypes: ["comida", "cena"],
     flavorType: "salado",
     tags: ["air fryer", "sartén", "alta en proteína", "con verduras", "cena", "personalizable"],
@@ -900,6 +908,8 @@ export const recipes: Recipe[] = [
       "Unas bolitas o pequeños bocados de soja texturizada y verdura, horneados sin necesidad de darles la vuelta y acompañados de mazorca y una salsa fresca.",
     description:
       "Bocados de soja y verdura parecidos visualmente a unos falsos falafel, pero sin presentarlos como una receta tradicional, con acompañamiento opcional y salsa de aceite o aguacate.",
+    image: "/images/recipes/bolitas-soja-texturizada-verdura.png",
+    imageAlt: "Bolitas doradas de soja texturizada y verdura acompañadas de trozos de mazorca",
     mealTypes: ["comida", "cena"],
     flavorType: "salado",
     tags: ["horno", "alta en proteína", "soja texturizada", "con verduras", "falafel", "con salsa", "con acompañamiento", "personalizable"],
@@ -1051,6 +1061,8 @@ export const recipes: Recipe[] = [
       "Ñoquis caseros hechos con copos de patata deshidratados, agua hirviendo y harina, formados a mano y cocinados directamente en air fryer.",
     description:
       "Una preparación propia —no unos ñoquis italianos tradicionales— que no se hierve: la masa se pesa, se forma a mano y se cocina directamente en la air fryer para usarla en ensaladas, bowls o como guarnición.",
+    image: "/images/recipes/noquis-caseros-patata.png",
+    imageAlt: "Ñoquis caseros de patata dorados en air fryer y servidos en un bol blanco",
     mealTypes: ["comida", "cena"],
     flavorType: "salado",
     recipeKind: "preparacion-base",
