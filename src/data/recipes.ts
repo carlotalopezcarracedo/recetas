@@ -720,6 +720,8 @@ export const recipes: Recipe[] = [
       "Un bol de avena suelta y voluminosa que se cocina por ciclos, añadiendo claras poco a poco hasta llenar el recipiente y terminándolo con fruta, leche fría y toppings.",
     description:
       "No busca ser un bizcocho, un bloque compacto ni un porridge uniforme: el objetivo es obtener avena aireada, suelta y fácil de separar, con las claras completamente cocinadas.",
+    image: "/images/recipes/bol-avena-fruta-frutos-secos.png",
+    imageAlt: "Bol de avena cubierto con arándanos y frutos secos troceados",
     mealTypes: ["desayuno", "merienda"],
     flavorType: "dulce",
     tags: ["microondas", "alta en proteína", "con fruta", "frutos secos", "personalizable", "por ciclos"],
